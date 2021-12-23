@@ -27,7 +27,10 @@ class CustomCachedImage {
                   borderRadius: borderRadius ?? BorderRadius.circular(0)),
               width: double.infinity,
               height: double.infinity,
-              child: const Icon(Icons.image, size: 100))),
+              child: Container()
+              // child: const Icon(Icons.image, size: 70)
+
+              )),
       errorWidget: (context, url, error) => Container(
         color: Colors.grey.shade100,
         width: double.infinity,
@@ -35,7 +38,9 @@ class CustomCachedImage {
         child: Shimmer.fromColors(
             baseColor: Colors.grey.shade200,
             highlightColor: Colors.grey.shade100,
-            child: const Icon(Icons.image, size: 100)),
+            child: Container()
+            // child: const Icon(Icons.image, size: 70)
+            ),
       ),
     );
   }
