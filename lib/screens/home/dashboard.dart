@@ -1,6 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:in_app_update/in_app_update.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:recipe_app/blocs/recipe_bloc/recipe_bloc.dart';
+import 'package:recipe_app/screens/about/about_screen.dart';
 import 'package:recipe_app/screens/recipes/recipe_category.dart';
 import 'package:recipe_app/screens/recipes/recipe_detail.dart';
 import 'package:recipe_app/screens/search/search_recipe.dart';
@@ -17,6 +22,8 @@ class _DashboardState extends State<Dashboard> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late RecipeBloc recipeBloc;
   final ScrollController _scrollController = ScrollController();
+  // AppUpdateInfo? _updateInfo;
+  String version = '';
 
   /// Set default hasReachMax value false
   /// Variabel ini digunakan untuk menangani agaer scrollController tidak-
@@ -37,10 +44,44 @@ class _DashboardState extends State<Dashboard> {
     recipeBloc.add(GetRecipe(10, true));
   }
 
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> checkForUpdate() async {
+    InAppUpdate.checkForUpdate().then((info) {
+      setState(() {
+        // _updateInfo = info;
+      });
+    }).catchError((e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+    });
+  }
+
+  Future getPackageInfo() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    version = packageInfo.version;
+    setState(() {});
+  }
+
+  final BannerAd myBanner = BannerAd(
+    adUnitId: 'ca-app-pub-2465007971338713/3844478337',
+    size: AdSize.banner,
+    request: AdRequest(),
+    listener: BannerAdListener(),
+  );
+
+  loadAds() async {
+    await myBanner.load();
+    setState(() {});
+  }
+
   @override
   void initState() {
     recipeBloc = BlocProvider.of<RecipeBloc>(context);
     recipeBloc.add(GetRecipe(10, true));
+    checkForUpdate();
+    getPackageInfo();
+    loadAds();
 
     _scrollController.addListener(onScroll);
     super.initState();
@@ -101,7 +142,6 @@ class _DashboardState extends State<Dashboard> {
                   ),
                   decoration: const BoxDecoration(color: Colors.orange),
                 ),
-                ListTile(onTap: () {}, title: const Text("Beranda")),
                 ListTile(
                     onTap: () {
                       _scaffoldKey.currentState?.openEndDrawer();
@@ -114,121 +154,171 @@ class _DashboardState extends State<Dashboard> {
                 ListTile(
                     onTap: () {
                       _scaffoldKey.currentState?.openEndDrawer();
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return const AboutScreen();
+                      }));
                     },
                     title: const Text("Tentang Aplikasi")),
-                ListTile(onTap: () {}, title: const Text("Versi 1.0.0")),
+                ListTile(onTap: () {}, title: Text(version)),
               ]),
             ),
           ),
-          body: RefreshIndicator(
-            backgroundColor: Colors.white,
-            color: Colors.orangeAccent.shade700,
-            displacement: 20,
-            onRefresh: () => _refresh(),
-            child: BlocBuilder<RecipeBloc, RecipeState>(
-              builder: (context, state) {
-                if (state is RecipeData) {
-                  return ListView.builder(
-                      controller: _scrollController,
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.only(bottom: 10),
-                      itemCount: state.hasReachMax
-                          ? state.listRecipes.length
-                          : state.listRecipes.length + 1,
-                      itemBuilder: (context, index) {
-                        if (index < state.listRecipes.length) {
-                          return GestureDetector(
-                            onTap: () {
-                              Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) {
-                                return RecipeDetail(
-                                  keyRecipe: state.listRecipes[index].key!,
-                                );
-                              }));
-                            },
-                            child: Container(
-                              margin: const EdgeInsets.only(bottom: 10),
-                              child: Wrap(
-                                children: [
-                                  SizedBox(
-                                    width: size.width,
-                                    height: size.height * 0.3,
-                                    child: CustomCachedImage.build(context,
-                                        imgUrl: state.listRecipes[index].thumb),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 10),
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          children: [
-                                            const Icon(Icons.timer),
-                                            const SizedBox(
-                                              width: 3,
-                                            ),
-                                            Text(state
-                                                    .listRecipes[index].times ??
-                                                ''),
-                                            const SizedBox(
-                                              width: 10,
-                                            ),
-                                            const Icon(Icons.contact_support),
-                                            const SizedBox(
-                                              width: 3,
-                                            ),
-                                            Text(state.listRecipes[index]
-                                                    .dificulty ??
-                                                ''),
-                                            const SizedBox(
-                                              width: 10,
-                                            ),
-                                            const Icon(Icons.ramen_dining),
-                                            const SizedBox(
-                                              width: 3,
-                                            ),
-                                            Text(state.listRecipes[index]
-                                                    .portion ??
-                                                ''),
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                          height: 5,
-                                        ),
-                                        Text(
-                                          state.listRecipes[index].title ?? '',
-                                          style: const TextStyle(fontSize: 16),
-                                        )
-                                      ],
+          body: Stack(
+            children: [
+              RefreshIndicator(
+                backgroundColor: Colors.white,
+                color: Colors.orangeAccent.shade700,
+                displacement: 20,
+                onRefresh: () => _refresh(),
+                child: BlocBuilder<RecipeBloc, RecipeState>(
+                  builder: (context, state) {
+                    if (state is RecipeData) {
+                      return ListView.separated(
+                        controller: _scrollController,
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.only(bottom: 10),
+                        itemCount: state.hasReachMax
+                            ? state.listRecipes.length
+                            : state.listRecipes.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index < state.listRecipes.length) {
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) {
+                                  return RecipeDetail(
+                                    recipeModel: state.listRecipes[index],
+                                  );
+                                }));
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: 10),
+                                child: Wrap(
+                                  children: [
+                                    SizedBox(
+                                      width: size.width,
+                                      height: size.height * 0.3,
+                                      child: CustomCachedImage.build(context,
+                                          imgUrl:
+                                              state.listRecipes[index].thumb),
                                     ),
-                                  )
-                                ],
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 10),
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              const Icon(Icons.timer, size: 20),
+                                              const SizedBox(
+                                                width: 3,
+                                              ),
+                                              Text(
+                                                  state.listRecipes[index]
+                                                          .times ??
+                                                      '',
+                                                  style:
+                                                      TextStyle(fontSize: 12)),
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              const Icon(Icons.contact_support,
+                                                  size: 20),
+                                              const SizedBox(
+                                                width: 3,
+                                              ),
+                                              Text(
+                                                  state.listRecipes[index]
+                                                          .dificulty ??
+                                                      '',
+                                                  style:
+                                                      TextStyle(fontSize: 12)),
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              const Icon(Icons.ramen_dining,
+                                                  size: 20),
+                                              const SizedBox(
+                                                width: 3,
+                                              ),
+                                              Text(
+                                                  state.listRecipes[index]
+                                                          .portion ??
+                                                      '',
+                                                  style: const TextStyle(
+                                                      fontSize: 12)),
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text(
+                                            state.listRecipes[index].title ??
+                                                '',
+                                            style:
+                                                const TextStyle(fontSize: 16),
+                                          )
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        } else {
-                          return Center(
-                            child: SizedBox(
-                              width: 30,
-                              height: 30,
-                              child: CircularProgressIndicator(
-                                  color: Colors.orange.shade600,
-                                  strokeWidth: 2),
-                            ),
-                          );
-                        }
-                      });
-                } else {
-                  return Center(
-                      child: SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: CircularProgressIndicator(
-                        color: Colors.orange.shade600, strokeWidth: 3),
-                  ));
-                }
-              },
-            ),
+                            );
+                          } else {
+                            return Center(
+                              child: SizedBox(
+                                width: 30,
+                                height: 30,
+                                child: CircularProgressIndicator(
+                                    color: Colors.orange.shade600,
+                                    strokeWidth: 2),
+                              ),
+                            );
+                          }
+                        },
+                        separatorBuilder: (BuildContext context, int index) {
+                          return Container();
+                          // if (index == 3 || index % 6 == 0) {
+                          //   return Positioned(
+                          //       child: Align(
+                          //     alignment: Alignment.bottomCenter,
+                          //     child: Container(
+                          //       width: size.width,
+                          //       height: size.height * 0.3,
+                          //       child: AdWidget(ad: myBanner),
+                          //       // width: myBanner.size.width.toDouble(),
+                          //       // height: myBanner.size.height.toDouble(),
+                          //     ),
+                          //   ));
+                          // } else {
+                          //   return Container();
+                          // }
+                        },
+                      );
+                    } else {
+                      return Center(
+                          child: SizedBox(
+                        width: 30,
+                        height: 30,
+                        child: CircularProgressIndicator(
+                            color: Colors.orange.shade600, strokeWidth: 3),
+                      ));
+                    }
+                  },
+                ),
+              ),
+              Positioned(
+                  child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  child: AdWidget(ad: myBanner),
+                  width: myBanner.size.width.toDouble(),
+                  height: myBanner.size.height.toDouble(),
+                ),
+              ))
+            ],
           )),
     );
   }

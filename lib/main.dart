@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:recipe_app/blocs/recipe_bloc/recipe_bloc.dart';
+import 'package:recipe_app/blocs/recipe_category_bloc/recipe_category_bloc.dart';
 import 'package:recipe_app/blocs/recipe_detail_bloc/recipe_detail_bloc.dart';
+import 'package:recipe_app/blocs/recipe_search_bloc/recipe_search_bloc.dart';
 import 'package:recipe_app/screens/home/dashboard.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await MobileAds.instance.initialize();
 
   await dotenv.load(fileName: "assets/env/.env_production");
   runApp(const MyApp());
@@ -29,6 +33,12 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<RecipeDetailBloc>(
           create: (context) => RecipeDetailBloc(),
+        ),
+        BlocProvider<RecipeCategoryBloc>(
+          create: (context) => RecipeCategoryBloc(),
+        ),
+        BlocProvider<RecipeSearchBloc>(
+          create: (context) => RecipeSearchBloc(),
         ),
       ],
       child: MaterialApp(

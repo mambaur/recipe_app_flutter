@@ -1,10 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.recipe_app">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.caraguna.recipe_apps">
     <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="recipe_app"
+        android:label="Resep Masakan"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-2465007971338713~2110658444"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

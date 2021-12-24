@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:readmore/readmore.dart';
 import 'package:recipe_app/blocs/recipe_detail_bloc/recipe_detail_bloc.dart';
+import 'package:recipe_app/models/recipe_model.dart';
 import 'package:recipe_app/utils/custom_cached_image.dart';
+import 'package:recipe_app/utils/image_viewer.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class RecipeDetail extends StatefulWidget {
-  final String keyRecipe;
-  const RecipeDetail({Key? key, required this.keyRecipe}) : super(key: key);
+  final RecipeModel recipeModel;
+  const RecipeDetail({Key? key, required this.recipeModel}) : super(key: key);
 
   @override
   _RecipeDetailState createState() => _RecipeDetailState();
@@ -45,7 +47,7 @@ class _RecipeDetailState extends State<RecipeDetail> {
   @override
   void initState() {
     recipeDetailBloc = BlocProvider.of<RecipeDetailBloc>(context);
-    recipeDetailBloc.add(GetRecipeDetail(widget.keyRecipe));
+    recipeDetailBloc.add(GetRecipeDetail(widget.recipeModel.key!));
     super.initState();
   }
 
@@ -239,15 +241,26 @@ class _RecipeDetailState extends State<RecipeDetail> {
               },
               body: Stack(
                 children: [
-                  Container(
-                    color: Colors.grey.shade300,
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: SizedBox(
-                        width: size.width,
-                        height: size.height * 0.55,
-                        child: CustomCachedImage.build(context,
-                            imgUrl: state.recipeModel.thumb),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return ImageViewer(
+                            imageURL: state.recipeModel.thumb ??
+                                widget.recipeModel.thumb!);
+                      }));
+                    },
+                    child: Container(
+                      color: Colors.grey.shade300,
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: SizedBox(
+                          width: size.width,
+                          height: size.height * 0.55,
+                          child: CustomCachedImage.build(context,
+                              imgUrl: state.recipeModel.thumb ??
+                                  widget.recipeModel.thumb),
+                        ),
                       ),
                     ),
                   ),
