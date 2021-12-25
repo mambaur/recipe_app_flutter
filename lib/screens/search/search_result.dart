@@ -71,7 +71,7 @@ class _SearchResultState extends State<SearchResult> {
                             width: 3,
                           ),
                           Text(state.listRecipes[index].times ?? '',
-                              style: TextStyle(fontSize: 14)),
+                              style: const TextStyle(fontSize: 14)),
                           const SizedBox(
                             width: 10,
                           ),
@@ -81,7 +81,7 @@ class _SearchResultState extends State<SearchResult> {
                             width: 3,
                           ),
                           Text(state.listRecipes[index].difficulty ?? '',
-                              style: TextStyle(fontSize: 14)),
+                              style: const TextStyle(fontSize: 14)),
                           const SizedBox(
                             width: 10,
                           ),
@@ -91,7 +91,7 @@ class _SearchResultState extends State<SearchResult> {
                             width: 3,
                           ),
                           Text(state.listRecipes[index].serving ?? '',
-                              style: TextStyle(fontSize: 14)),
+                              style: const TextStyle(fontSize: 14)),
                         ],
                       ),
                       onTap: () {

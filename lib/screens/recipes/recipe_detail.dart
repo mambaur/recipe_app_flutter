@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:native_admob_flutter/native_admob_flutter.dart';
+// import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:readmore/readmore.dart';
 import 'package:recipe_app/blocs/recipe_detail_bloc/recipe_detail_bloc.dart';
 import 'package:recipe_app/models/recipe_model.dart';
@@ -19,6 +21,12 @@ class _RecipeDetailState extends State<RecipeDetail> {
   final PanelController _panelController = PanelController();
   late RecipeDetailBloc recipeDetailBloc;
 
+  String removeFirstWord(String word) {
+    List<String> listWord = word.split(' ');
+    listWord.removeAt(0);
+    return listWord.join(" ");
+  }
+
   Widget stepWidget(List<String> steps) {
     List<Widget> children = [];
     for (var i = 0; i < steps.length; i++) {
@@ -36,7 +44,7 @@ class _RecipeDetailState extends State<RecipeDetail> {
             ),
           ),
         ),
-        title: Text(steps[i]),
+        title: Text(removeFirstWord(steps[i])),
       ));
     }
     return Column(
@@ -48,6 +56,7 @@ class _RecipeDetailState extends State<RecipeDetail> {
   void initState() {
     recipeDetailBloc = BlocProvider.of<RecipeDetailBloc>(context);
     recipeDetailBloc.add(GetRecipeDetail(widget.recipeModel.key!));
+    // loadAds();
     super.initState();
   }
 
@@ -218,6 +227,17 @@ class _RecipeDetailState extends State<RecipeDetail> {
                               height: 10,
                             ),
                             stepWidget(state.recipeModel.steps ?? []),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            const Center(
+                              child: BannerAd(
+                                size: BannerSize.BANNER,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
                           ],
                         ),
                       ),

@@ -184,13 +184,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  google_mobile_ads:
-    dependency: "direct main"
-    description:
-      name: google_mobile_ads
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.1"
   http:
     dependency: "direct main"
     description:
@@ -247,6 +240,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.7.0"
+  native_admob_flutter:
+    dependency: "direct main"
+    description:
+      name: native_admob_flutter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.5.0"
   nested:
     dependency: transitive
     description:

@@ -30,7 +30,7 @@ class RecipeRepository {
   Future<RecipeModel?> getRecipeDetail(String key) async {
     try {
       final response = await http.get(Uri.parse(_baseUrl + '/recipe/$key'));
-      print(response.body);
+      // print(response.body);
 
       if (response.statusCode == 200) {
         return RecipeModel.fromJson(json.decode(response.body)['results']);

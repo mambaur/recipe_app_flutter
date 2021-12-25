@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:native_admob_flutter/native_admob_flutter.dart';
 import 'package:recipe_app/blocs/recipe_category_bloc/recipe_category_bloc.dart';
 import 'package:recipe_app/models/recipe_model.dart';
 import 'package:recipe_app/screens/recipes/recipe_detail.dart';
@@ -37,7 +38,6 @@ class _RecipeCategoryResultState extends State<RecipeCategoryResult> {
       appBar: AppBar(
         title: Text(
           widget.recipeCategory.category ?? '',
-          style: const TextStyle(fontWeight: FontWeight.normal),
         ),
         centerTitle: true,
       ),
@@ -47,71 +47,82 @@ class _RecipeCategoryResultState extends State<RecipeCategoryResult> {
         color: Colors.orangeAccent.shade700,
         displacement: 20,
         onRefresh: () => _refresh(),
-        child: BlocBuilder<RecipeCategoryBloc, RecipeCategoryState>(
-          builder: (context, state) {
-            if (state is RecipeByCategoryData) {
-              return ListView.builder(
-                  itemCount: state.listRecipes.length,
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(state.listRecipes[index].title ?? ''),
-                      subtitle: Wrap(
-                        children: [
-                          const Icon(Icons.timer, size: 14, color: Colors.grey),
-                          const SizedBox(
-                            width: 3,
+        child: Stack(
+          children: [
+            BlocBuilder<RecipeCategoryBloc, RecipeCategoryState>(
+              builder: (context, state) {
+                if (state is RecipeByCategoryData) {
+                  return ListView.builder(
+                      itemCount: state.listRecipes.length,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(state.listRecipes[index].title ?? ''),
+                          subtitle: Wrap(
+                            children: [
+                              const Icon(Icons.timer,
+                                  size: 14, color: Colors.grey),
+                              const SizedBox(
+                                width: 3,
+                              ),
+                              Text(state.listRecipes[index].times ?? '',
+                                  style: const TextStyle(fontSize: 14)),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              const Icon(Icons.contact_support,
+                                  size: 14, color: Colors.grey),
+                              const SizedBox(
+                                width: 3,
+                              ),
+                              Text(state.listRecipes[index].dificulty ?? '',
+                                  style: const TextStyle(fontSize: 14)),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              const Icon(Icons.ramen_dining,
+                                  size: 14, color: Colors.grey),
+                              const SizedBox(
+                                width: 3,
+                              ),
+                              Text(state.listRecipes[index].portion ?? '',
+                                  style: const TextStyle(fontSize: 14)),
+                            ],
                           ),
-                          Text(state.listRecipes[index].times ?? '',
-                              style: const TextStyle(fontSize: 14)),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          const Icon(Icons.contact_support,
-                              size: 14, color: Colors.grey),
-                          const SizedBox(
-                            width: 3,
-                          ),
-                          Text(state.listRecipes[index].dificulty ?? '',
-                              style: const TextStyle(fontSize: 14)),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          const Icon(Icons.ramen_dining,
-                              size: 14, color: Colors.grey),
-                          const SizedBox(
-                            width: 3,
-                          ),
-                          Text(state.listRecipes[index].portion ?? '',
-                              style: const TextStyle(fontSize: 14)),
-                        ],
-                      ),
-                      onTap: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) {
-                          return RecipeDetail(
-                            recipeModel: state.listRecipes[index],
-                          );
-                        }));
-                      },
-                      leading: SizedBox(
-                          width: 70,
-                          height: 70,
-                          child: CustomCachedImage.build(context,
-                              imgUrl: state.listRecipes[index].thumb ?? '',
-                              borderRadius: BorderRadius.circular(10))),
-                    );
-                  });
-            } else {
-              return Center(
-                  child: SizedBox(
-                width: 30,
-                height: 30,
-                child: CircularProgressIndicator(
-                    color: Colors.orange.shade600, strokeWidth: 3),
-              ));
-            }
-          },
+                          onTap: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) {
+                              return RecipeDetail(
+                                recipeModel: state.listRecipes[index],
+                              );
+                            }));
+                          },
+                          leading: SizedBox(
+                              width: 70,
+                              height: 70,
+                              child: CustomCachedImage.build(context,
+                                  imgUrl: state.listRecipes[index].thumb ?? '',
+                                  borderRadius: BorderRadius.circular(10))),
+                        );
+                      });
+                } else {
+                  return Center(
+                      child: SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: CircularProgressIndicator(
+                        color: Colors.orange.shade600, strokeWidth: 3),
+                  ));
+                }
+              },
+            ),
+            const Positioned(
+                child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: BannerAd(
+                      size: BannerSize.BANNER,
+                    )))
+          ],
         ),
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:native_admob_flutter/native_admob_flutter.dart';
+// import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:recipe_app/screens/search/search_result.dart';
 
 class SearchRecipe extends StatefulWidget {
@@ -12,26 +13,15 @@ class SearchRecipe extends StatefulWidget {
 class _SearchRecipeState extends State<SearchRecipe> {
   TextEditingController searchController = TextEditingController();
 
-  final BannerAd myBanner = BannerAd(
-    adUnitId: 'ca-app-pub-2465007971338713/4377479735',
-    size: AdSize.mediumRectangle,
-    request: AdRequest(),
-    listener: BannerAdListener(),
-  );
-
-  loadAds() async {
-    await myBanner.load();
-    setState(() {});
-  }
-
   @override
   void initState() {
-    loadAds();
+    // loadAds();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         title: TextField(
@@ -40,11 +30,13 @@ class _SearchRecipeState extends State<SearchRecipe> {
           textInputAction: TextInputAction.search,
           autofocus: true,
           onSubmitted: (value) {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return SearchResult(
-                keyword: searchController.text,
-              );
-            }));
+            if (searchController.text != '') {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return SearchResult(
+                  keyword: searchController.text,
+                );
+              }));
+            }
           },
           decoration: const InputDecoration(
               border: InputBorder.none, hintText: 'Cari masakan favoritmu...'),
@@ -53,10 +45,12 @@ class _SearchRecipeState extends State<SearchRecipe> {
       body: Align(
         alignment: Alignment.topCenter,
         child: Container(
-          margin: EdgeInsets.only(top: 15),
-          child: AdWidget(ad: myBanner),
-          width: myBanner.size.width.toDouble(),
-          height: myBanner.size.height.toDouble(),
+          margin: const EdgeInsets.only(top: 15),
+          child: const BannerAd(
+            size: BannerSize.MEDIUM_RECTANGLE,
+          ),
+          width: 320,
+          height: 250,
         ),
       ),
     );

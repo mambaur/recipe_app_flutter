@@ -1,8 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+// import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:in_app_update/in_app_update.dart';
+import 'package:native_admob_flutter/native_admob_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:recipe_app/blocs/recipe_bloc/recipe_bloc.dart';
 import 'package:recipe_app/screens/about/about_screen.dart';
@@ -63,17 +64,17 @@ class _DashboardState extends State<Dashboard> {
     setState(() {});
   }
 
-  final BannerAd myBanner = BannerAd(
-    adUnitId: 'ca-app-pub-2465007971338713/3844478337',
-    size: AdSize.banner,
-    request: AdRequest(),
-    listener: BannerAdListener(),
-  );
+  // BannerAd myBanner = BannerAd(
+  //   adUnitId: 'ca-app-pub-2465007971338713/3844478337',
+  //   size: AdSize.banner,
+  //   request: AdRequest(),
+  //   listener: BannerAdListener(),
+  // );
 
-  loadAds() async {
-    await myBanner.load();
-    setState(() {});
-  }
+  // loadAds() async {
+  //   await myBanner.load();
+  //   setState(() {});
+  // }
 
   @override
   void initState() {
@@ -81,7 +82,7 @@ class _DashboardState extends State<Dashboard> {
     recipeBloc.add(GetRecipe(10, true));
     checkForUpdate();
     getPackageInfo();
-    loadAds();
+    // loadAds();
 
     _scrollController.addListener(onScroll);
     super.initState();
@@ -207,6 +208,8 @@ class _DashboardState extends State<Dashboard> {
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 10),
                                       child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Row(
                                             children: [
@@ -218,8 +221,8 @@ class _DashboardState extends State<Dashboard> {
                                                   state.listRecipes[index]
                                                           .times ??
                                                       '',
-                                                  style:
-                                                      TextStyle(fontSize: 12)),
+                                                  style: const TextStyle(
+                                                      fontSize: 12)),
                                               const SizedBox(
                                                 width: 10,
                                               ),
@@ -232,8 +235,8 @@ class _DashboardState extends State<Dashboard> {
                                                   state.listRecipes[index]
                                                           .dificulty ??
                                                       '',
-                                                  style:
-                                                      TextStyle(fontSize: 12)),
+                                                  style: const TextStyle(
+                                                      fontSize: 12)),
                                               const SizedBox(
                                                 width: 10,
                                               ),
@@ -279,22 +282,17 @@ class _DashboardState extends State<Dashboard> {
                           }
                         },
                         separatorBuilder: (BuildContext context, int index) {
-                          return Container();
-                          // if (index == 3 || index % 6 == 0) {
-                          //   return Positioned(
-                          //       child: Align(
-                          //     alignment: Alignment.bottomCenter,
-                          //     child: Container(
-                          //       width: size.width,
-                          //       height: size.height * 0.3,
-                          //       child: AdWidget(ad: myBanner),
-                          //       // width: myBanner.size.width.toDouble(),
-                          //       // height: myBanner.size.height.toDouble(),
-                          //     ),
-                          //   ));
-                          // } else {
-                          //   return Container();
-                          // }
+                          // return Container();
+                          if (index == 3 || index % 6 == 0) {
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 10),
+                              child: const BannerAd(
+                                size: BannerSize.BANNER,
+                              ),
+                            );
+                          } else {
+                            return Container();
+                          }
                         },
                       );
                     } else {
@@ -309,15 +307,6 @@ class _DashboardState extends State<Dashboard> {
                   },
                 ),
               ),
-              Positioned(
-                  child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  child: AdWidget(ad: myBanner),
-                  width: myBanner.size.width.toDouble(),
-                  height: myBanner.size.height.toDouble(),
-                ),
-              ))
             ],
           )),
     );
