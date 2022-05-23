@@ -11,7 +11,7 @@ class RecipeRepository {
   Future<List<RecipeModel>?> getRecipes({int page = 1}) async {
     try {
       final response = await http.get(Uri.parse(_baseUrl + '/recipes/$page'));
-      // print(response.body);
+      print(response.body);
 
       if (response.statusCode == 200) {
         Iterable iterable = json.decode(response.body)['results'];

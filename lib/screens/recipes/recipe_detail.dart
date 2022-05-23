@@ -1,13 +1,15 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:native_admob_flutter/native_admob_flutter.dart';
-// import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:readmore/readmore.dart';
 import 'package:recipe_app/blocs/recipe_detail_bloc/recipe_detail_bloc.dart';
 import 'package:recipe_app/models/recipe_model.dart';
 import 'package:recipe_app/utils/custom_cached_image.dart';
 import 'package:recipe_app/utils/image_viewer.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+
+enum StatusAd { initial, loaded }
 
 class RecipeDetail extends StatefulWidget {
   final RecipeModel recipeModel;
@@ -20,6 +22,22 @@ class RecipeDetail extends StatefulWidget {
 class _RecipeDetailState extends State<RecipeDetail> {
   final PanelController _panelController = PanelController();
   late RecipeDetailBloc recipeDetailBloc;
+
+  BannerAd? myBanner;
+
+  StatusAd statusAd = StatusAd.initial;
+
+  BannerAdListener listener() => BannerAdListener(
+        // Called when an ad is successfully received.
+        onAdLoaded: (Ad ad) {
+          if (kDebugMode) {
+            print('Ad Loaded.');
+          }
+          setState(() {
+            statusAd = StatusAd.loaded;
+          });
+        },
+      );
 
   String removeFirstWord(String word) {
     List<String> listWord = word.split(' ');
@@ -56,8 +74,23 @@ class _RecipeDetailState extends State<RecipeDetail> {
   void initState() {
     recipeDetailBloc = BlocProvider.of<RecipeDetailBloc>(context);
     recipeDetailBloc.add(GetRecipeDetail(widget.recipeModel.key!));
-    // loadAds();
+    myBanner = BannerAd(
+      // test banner
+      // adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+      //
+      adUnitId: 'ca-app-pub-2465007971338713/4428371035',
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: listener(),
+    );
+    myBanner!.load();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    myBanner!.dispose();
+    super.dispose();
   }
 
   @override
@@ -97,25 +130,25 @@ class _RecipeDetailState extends State<RecipeDetail> {
                               margin: const EdgeInsets.symmetric(vertical: 10),
                               child: Row(
                                 children: [
-                                  const Icon(Icons.account_circle_rounded,
-                                      color: Colors.grey),
+                                  Icon(Icons.account_circle_rounded,
+                                      color: Colors.grey.shade400),
                                   const SizedBox(
                                     width: 3,
                                   ),
                                   Text(state.recipeModel.user ?? '',
-                                      style:
-                                          const TextStyle(color: Colors.grey)),
+                                      style: TextStyle(
+                                          color: Colors.grey.shade400)),
                                   const SizedBox(
-                                    width: 5,
+                                    width: 10,
                                   ),
-                                  const Icon(Icons.date_range,
-                                      color: Colors.grey),
+                                  Icon(Icons.date_range,
+                                      color: Colors.grey.shade400),
                                   const SizedBox(
                                     width: 3,
                                   ),
                                   Text(state.recipeModel.datePublished ?? '',
-                                      style:
-                                          const TextStyle(color: Colors.grey)),
+                                      style: TextStyle(
+                                          color: Colors.grey.shade400)),
                                 ],
                               ),
                             ),
@@ -123,7 +156,6 @@ class _RecipeDetailState extends State<RecipeDetail> {
                               state.recipeModel.desc ?? '',
                               trimLines: 5,
                               style: const TextStyle(color: Colors.black),
-                              // colorClickableText: Colors.pink,
                               trimMode: TrimMode.Line,
                               trimCollapsedText: 'Lihat Selengkapnya',
                               trimExpandedText: 'Sembunyikan',
@@ -149,7 +181,8 @@ class _RecipeDetailState extends State<RecipeDetail> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(Icons.timer, color: Colors.orange),
+                                Icon(Icons.timer_outlined,
+                                    color: Colors.orange.shade700),
                                 const SizedBox(
                                   width: 3,
                                 ),
@@ -157,10 +190,10 @@ class _RecipeDetailState extends State<RecipeDetail> {
                                     style:
                                         const TextStyle(color: Colors.black)),
                                 const SizedBox(
-                                  width: 5,
+                                  width: 10,
                                 ),
-                                const Icon(Icons.contact_support,
-                                    color: Colors.orange),
+                                Icon(Icons.contact_support_outlined,
+                                    color: Colors.orange.shade700),
                                 const SizedBox(
                                   width: 3,
                                 ),
@@ -168,10 +201,10 @@ class _RecipeDetailState extends State<RecipeDetail> {
                                     style:
                                         const TextStyle(color: Colors.black)),
                                 const SizedBox(
-                                  width: 5,
+                                  width: 10,
                                 ),
-                                const Icon(Icons.ramen_dining,
-                                    color: Colors.orange),
+                                Icon(Icons.ramen_dining_outlined,
+                                    color: Colors.orange.shade700),
                                 const SizedBox(
                                   width: 3,
                                 ),
@@ -230,10 +263,17 @@ class _RecipeDetailState extends State<RecipeDetail> {
                             const SizedBox(
                               height: 15,
                             ),
-                            const Center(
-                              child: BannerAd(
-                                size: BannerSize.BANNER,
-                              ),
+                            Center(
+                              child: statusAd == StatusAd.loaded
+                                  ? Container(
+                                      margin: EdgeInsets.only(
+                                          top: 10, left: 10, right: 10),
+                                      alignment: Alignment.center,
+                                      child: AdWidget(ad: myBanner!),
+                                      width: myBanner!.size.width.toDouble(),
+                                      height: myBanner!.size.height.toDouble(),
+                                    )
+                                  : Container(),
                             ),
                             const SizedBox(
                               height: 15,
@@ -293,7 +333,10 @@ class _RecipeDetailState extends State<RecipeDetail> {
                               Icons.arrow_back,
                               color: Colors.white,
                             )),
-                        const Text(
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
                           "Detail Resep",
                           style: TextStyle(
                               color: Colors.white,

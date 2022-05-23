@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:recipe_app/blocs/recipe_search_bloc/recipe_search_bloc.dart';
 import 'package:recipe_app/screens/recipes/recipe_detail.dart';
 import 'package:recipe_app/utils/custom_cached_image.dart';
+import 'package:recipe_app/utils/text_format.dart';
 
 class SearchResult extends StatefulWidget {
   final String keyword;
@@ -63,35 +64,46 @@ class _SearchResultState extends State<SearchResult> {
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(state.listRecipes[index].title ?? ''),
+                      title: Text(
+                        state.listRecipes[index].title != null
+                            ? state.listRecipes[index].title!
+                            : TextFormat.slugToTitle(
+                                state.listRecipes[index].key ?? ''),
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       subtitle: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
-                          const Icon(Icons.timer, size: 14, color: Colors.grey),
+                          Icon(Icons.timer_outlined,
+                              size: 14, color: Colors.grey.shade400),
                           const SizedBox(
                             width: 3,
                           ),
                           Text(state.listRecipes[index].times ?? '',
-                              style: const TextStyle(fontSize: 14)),
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.grey.shade400)),
                           const SizedBox(
                             width: 10,
                           ),
-                          const Icon(Icons.contact_support,
-                              size: 14, color: Colors.grey),
+                          Icon(Icons.contact_support_outlined,
+                              size: 14, color: Colors.grey.shade400),
                           const SizedBox(
                             width: 3,
                           ),
                           Text(state.listRecipes[index].difficulty ?? '',
-                              style: const TextStyle(fontSize: 14)),
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.grey.shade400)),
                           const SizedBox(
                             width: 10,
                           ),
-                          const Icon(Icons.ramen_dining,
-                              size: 14, color: Colors.grey),
+                          Icon(Icons.ramen_dining_outlined,
+                              size: 14, color: Colors.grey.shade400),
                           const SizedBox(
                             width: 3,
                           ),
                           Text(state.listRecipes[index].serving ?? '',
-                              style: const TextStyle(fontSize: 14)),
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.grey.shade400)),
                         ],
                       ),
                       onTap: () {

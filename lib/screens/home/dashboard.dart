@@ -1,9 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:in_app_update/in_app_update.dart';
-import 'package:native_admob_flutter/native_admob_flutter.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:recipe_app/blocs/recipe_bloc/recipe_bloc.dart';
 import 'package:recipe_app/screens/about/about_screen.dart';
@@ -11,6 +9,10 @@ import 'package:recipe_app/screens/recipes/recipe_category.dart';
 import 'package:recipe_app/screens/recipes/recipe_detail.dart';
 import 'package:recipe_app/screens/search/search_recipe.dart';
 import 'package:recipe_app/utils/custom_cached_image.dart';
+import 'package:recipe_app/utils/text_format.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+enum StatusAd { initial, loaded }
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -23,8 +25,9 @@ class _DashboardState extends State<Dashboard> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late RecipeBloc recipeBloc;
   final ScrollController _scrollController = ScrollController();
-  // AppUpdateInfo? _updateInfo;
   String version = '';
+  final String _urlGooglePlay =
+      'https://play.google.com/store/apps/details?id=com.caraguna.recipe_apps';
 
   /// Set default hasReachMax value false
   /// Variabel ini digunakan untuk menangani agaer scrollController tidak-
@@ -45,47 +48,56 @@ class _DashboardState extends State<Dashboard> {
     recipeBloc.add(GetRecipe(10, true));
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> checkForUpdate() async {
-    InAppUpdate.checkForUpdate().then((info) {
-      setState(() {
-        // _updateInfo = info;
-      });
-    }).catchError((e) {
-      if (kDebugMode) {
-        print(e.toString());
-      }
-    });
-  }
-
   Future getPackageInfo() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     version = packageInfo.version;
     setState(() {});
   }
 
-  // BannerAd myBanner = BannerAd(
-  //   adUnitId: 'ca-app-pub-2465007971338713/3844478337',
-  //   size: AdSize.banner,
-  //   request: AdRequest(),
-  //   listener: BannerAdListener(),
-  // );
+  void _launchUrl(String _url) async {
+    if (!await launchUrl(Uri.parse(_url))) throw 'Could not launch $_url';
+  }
 
-  // loadAds() async {
-  //   await myBanner.load();
-  //   setState(() {});
-  // }
+  BannerAd? myBanner;
+
+  StatusAd statusAd = StatusAd.initial;
+
+  BannerAdListener listener() => BannerAdListener(
+        // Called when an ad is successfully received.
+        onAdLoaded: (Ad ad) {
+          if (kDebugMode) {
+            print('Ad Loaded.');
+          }
+          setState(() {
+            statusAd = StatusAd.loaded;
+          });
+        },
+      );
 
   @override
   void initState() {
     recipeBloc = BlocProvider.of<RecipeBloc>(context);
     recipeBloc.add(GetRecipe(10, true));
-    checkForUpdate();
     getPackageInfo();
-    // loadAds();
 
     _scrollController.addListener(onScroll);
+    myBanner = BannerAd(
+      // test banner
+      // adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+      //
+      adUnitId: 'ca-app-pub-2465007971338713/3844478337',
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: listener(),
+    );
+    myBanner!.load();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    myBanner!.dispose();
+    super.dispose();
   }
 
   @override
@@ -161,6 +173,12 @@ class _DashboardState extends State<Dashboard> {
                       }));
                     },
                     title: const Text("Tentang Aplikasi")),
+                ListTile(
+                    onTap: () {
+                      _scaffoldKey.currentState?.openEndDrawer();
+                      _launchUrl(_urlGooglePlay);
+                    },
+                    title: const Text("Cek Update")),
                 ListTile(onTap: () {}, title: Text(version)),
               ]),
             ),
@@ -213,7 +231,8 @@ class _DashboardState extends State<Dashboard> {
                                         children: [
                                           Row(
                                             children: [
-                                              const Icon(Icons.timer, size: 20),
+                                              const Icon(Icons.timer_outlined,
+                                                  size: 20),
                                               const SizedBox(
                                                 width: 3,
                                               ),
@@ -226,7 +245,9 @@ class _DashboardState extends State<Dashboard> {
                                               const SizedBox(
                                                 width: 10,
                                               ),
-                                              const Icon(Icons.contact_support,
+                                              const Icon(
+                                                  Icons
+                                                      .contact_support_outlined,
                                                   size: 20),
                                               const SizedBox(
                                                 width: 3,
@@ -240,7 +261,8 @@ class _DashboardState extends State<Dashboard> {
                                               const SizedBox(
                                                 width: 10,
                                               ),
-                                              const Icon(Icons.ramen_dining,
+                                              const Icon(
+                                                  Icons.ramen_dining_outlined,
                                                   size: 20),
                                               const SizedBox(
                                                 width: 3,
@@ -257,10 +279,17 @@ class _DashboardState extends State<Dashboard> {
                                             height: 5,
                                           ),
                                           Text(
-                                            state.listRecipes[index].title ??
-                                                '',
-                                            style:
-                                                const TextStyle(fontSize: 16),
+                                            state.listRecipes[index].title !=
+                                                    null
+                                                ? state
+                                                    .listRecipes[index].title!
+                                                : TextFormat.slugToTitle(state
+                                                        .listRecipes[index]
+                                                        .key ??
+                                                    ''),
+                                            style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
                                           )
                                         ],
                                       ),
@@ -282,17 +311,7 @@ class _DashboardState extends State<Dashboard> {
                           }
                         },
                         separatorBuilder: (BuildContext context, int index) {
-                          // return Container();
-                          if (index == 3 || index % 6 == 0) {
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 10),
-                              child: const BannerAd(
-                                size: BannerSize.BANNER,
-                              ),
-                            );
-                          } else {
-                            return Container();
-                          }
+                          return Container();
                         },
                       );
                     } else {
@@ -307,6 +326,19 @@ class _DashboardState extends State<Dashboard> {
                   },
                 ),
               ),
+              Positioned(
+                  child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: statusAd == StatusAd.loaded
+                          ? Container(
+                              margin:
+                                  EdgeInsets.only(top: 10, left: 10, right: 10),
+                              alignment: Alignment.center,
+                              child: AdWidget(ad: myBanner!),
+                              width: myBanner!.size.width.toDouble(),
+                              height: myBanner!.size.height.toDouble(),
+                            )
+                          : Container()))
             ],
           )),
     );

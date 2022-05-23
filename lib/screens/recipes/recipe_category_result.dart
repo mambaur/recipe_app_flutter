@@ -1,10 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:native_admob_flutter/native_admob_flutter.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:recipe_app/blocs/recipe_category_bloc/recipe_category_bloc.dart';
 import 'package:recipe_app/models/recipe_model.dart';
 import 'package:recipe_app/screens/recipes/recipe_detail.dart';
 import 'package:recipe_app/utils/custom_cached_image.dart';
+import 'package:recipe_app/utils/text_format.dart';
 
 class RecipeCategoryResult extends StatefulWidget {
   final RecipeCategoryModel recipeCategory;
@@ -24,12 +26,44 @@ class _RecipeCategoryResultState extends State<RecipeCategoryResult> {
         .add(GetRecipeByCategory(10, true, widget.recipeCategory.key ?? ''));
   }
 
+  BannerAd? myBanner;
+
+  StatusAd statusAd = StatusAd.initial;
+
+  BannerAdListener listener() => BannerAdListener(
+        // Called when an ad is successfully received.
+        onAdLoaded: (Ad ad) {
+          if (kDebugMode) {
+            print('Ad Loaded.');
+          }
+          setState(() {
+            statusAd = StatusAd.loaded;
+          });
+        },
+      );
+
   @override
   void initState() {
     recipeCategoryBloc = BlocProvider.of<RecipeCategoryBloc>(context);
     recipeCategoryBloc
         .add(GetRecipeByCategory(10, true, widget.recipeCategory.key ?? ''));
+    myBanner = BannerAd(
+      // test banner
+      // adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+      //
+      adUnitId: 'ca-app-pub-2465007971338713/3844478337',
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: listener(),
+    );
+    myBanner!.load();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    myBanner!.dispose();
+    super.dispose();
   }
 
   @override
@@ -57,36 +91,49 @@ class _RecipeCategoryResultState extends State<RecipeCategoryResult> {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       itemBuilder: (context, index) {
                         return ListTile(
-                          title: Text(state.listRecipes[index].title ?? ''),
+                          title: Text(
+                            state.listRecipes[index].title != null
+                                ? state.listRecipes[index].title!
+                                : TextFormat.slugToTitle(
+                                    state.listRecipes[index].key ?? ''),
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                           subtitle: Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
-                              const Icon(Icons.timer,
-                                  size: 14, color: Colors.grey),
+                              Icon(Icons.timer,
+                                  size: 14, color: Colors.grey.shade400),
                               const SizedBox(
                                 width: 3,
                               ),
                               Text(state.listRecipes[index].times ?? '',
-                                  style: const TextStyle(fontSize: 14)),
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey.shade400)),
                               const SizedBox(
                                 width: 10,
                               ),
-                              const Icon(Icons.contact_support,
-                                  size: 14, color: Colors.grey),
+                              Icon(Icons.contact_support,
+                                  size: 14, color: Colors.grey.shade400),
                               const SizedBox(
                                 width: 3,
                               ),
                               Text(state.listRecipes[index].dificulty ?? '',
-                                  style: const TextStyle(fontSize: 14)),
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey.shade400)),
                               const SizedBox(
                                 width: 10,
                               ),
-                              const Icon(Icons.ramen_dining,
-                                  size: 14, color: Colors.grey),
+                              Icon(Icons.ramen_dining,
+                                  size: 14, color: Colors.grey.shade400),
                               const SizedBox(
                                 width: 3,
                               ),
                               Text(state.listRecipes[index].portion ?? '',
-                                  style: const TextStyle(fontSize: 14)),
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey.shade400)),
                             ],
                           ),
                           onTap: () {
@@ -116,12 +163,19 @@ class _RecipeCategoryResultState extends State<RecipeCategoryResult> {
                 }
               },
             ),
-            const Positioned(
+            Positioned(
                 child: Align(
                     alignment: Alignment.bottomCenter,
-                    child: BannerAd(
-                      size: BannerSize.BANNER,
-                    )))
+                    child: statusAd == StatusAd.loaded
+                        ? Container(
+                            margin:
+                                EdgeInsets.only(top: 10, left: 10, right: 10),
+                            alignment: Alignment.center,
+                            child: AdWidget(ad: myBanner!),
+                            width: myBanner!.size.width.toDouble(),
+                            height: myBanner!.size.height.toDouble(),
+                          )
+                        : Container()))
           ],
         ),
       ),
