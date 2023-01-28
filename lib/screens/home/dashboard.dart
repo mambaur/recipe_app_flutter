@@ -28,6 +28,7 @@ class _DashboardState extends State<Dashboard> {
   String version = '';
   final String _urlGooglePlay =
       'https://play.google.com/store/apps/details?id=com.caraguna.recipe_apps';
+  final String _recipeWebUrl = 'https://masakin.caraguna.com';
 
   /// Set default hasReachMax value false
   /// Variabel ini digunakan untuk menangani agaer scrollController tidak-
@@ -179,6 +180,12 @@ class _DashboardState extends State<Dashboard> {
                       _launchUrl(_urlGooglePlay);
                     },
                     title: const Text("Cek Update")),
+                ListTile(
+                    onTap: () {
+                      _scaffoldKey.currentState?.openEndDrawer();
+                      _launchUrl(_recipeWebUrl);
+                    },
+                    title: const Text("Bagikan Resepmu")),
                 ListTile(onTap: () {}, title: Text(version)),
               ]),
             ),
@@ -219,8 +226,8 @@ class _DashboardState extends State<Dashboard> {
                                       width: size.width,
                                       height: size.height * 0.3,
                                       child: CustomCachedImage.build(context,
-                                          imgUrl:
-                                              state.listRecipes[index].thumb),
+                                          imgUrl: state
+                                              .listRecipes[index].coverImage),
                                     ),
                                     Container(
                                       padding: const EdgeInsets.symmetric(
@@ -231,39 +238,42 @@ class _DashboardState extends State<Dashboard> {
                                         children: [
                                           Row(
                                             children: [
-                                              const Icon(Icons.timer_outlined,
-                                                  size: 20),
+                                              Icon(Icons.timer_outlined,
+                                                  size: 20,
+                                                  color:
+                                                      Colors.orange.shade700),
                                               const SizedBox(
                                                 width: 3,
                                               ),
                                               Text(
                                                   state.listRecipes[index]
-                                                          .times ??
+                                                          .timeCooking ??
                                                       '',
                                                   style: const TextStyle(
                                                       fontSize: 12)),
                                               const SizedBox(
                                                 width: 10,
                                               ),
-                                              const Icon(
-                                                  Icons
-                                                      .contact_support_outlined,
-                                                  size: 20),
-                                              const SizedBox(
-                                                width: 3,
-                                              ),
-                                              Text(
-                                                  state.listRecipes[index]
-                                                          .dificulty ??
-                                                      '',
-                                                  style: const TextStyle(
-                                                      fontSize: 12)),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              const Icon(
-                                                  Icons.ramen_dining_outlined,
-                                                  size: 20),
+                                              // const Icon(
+                                              //     Icons
+                                              //         .contact_support_outlined,
+                                              //     size: 20),
+                                              // const SizedBox(
+                                              //   width: 3,
+                                              // ),
+                                              // Text(
+                                              //     state.listRecipes[index]
+                                              //             .portion ??
+                                              //         '',
+                                              //     style: const TextStyle(
+                                              //         fontSize: 12)),
+                                              // const SizedBox(
+                                              //   width: 10,
+                                              // ),
+                                              Icon(Icons.ramen_dining_outlined,
+                                                  size: 20,
+                                                  color:
+                                                      Colors.orange.shade700),
                                               const SizedBox(
                                                 width: 3,
                                               ),
@@ -285,7 +295,7 @@ class _DashboardState extends State<Dashboard> {
                                                     .listRecipes[index].title!
                                                 : TextFormat.slugToTitle(state
                                                         .listRecipes[index]
-                                                        .key ??
+                                                        .slug ??
                                                     ''),
                                             style: const TextStyle(
                                                 fontSize: 16,

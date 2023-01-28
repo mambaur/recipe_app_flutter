@@ -20,7 +20,7 @@ class RecipeCategoryBloc
     try {
       emit(GetRecipeByCategoryLoading());
       List<RecipeModel>? data =
-          await _recipeRepo.getListRecipesbyCategory(page: 1, key: event.key);
+          await _recipeRepo.getListRecipesbyCategory(page: 1, id: event.id);
       if (data != null) {
         listRecipes = data;
         emit(RecipeByCategoryData(listRecipes, true));

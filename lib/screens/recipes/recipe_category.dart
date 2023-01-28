@@ -75,7 +75,7 @@ class _RecipeCategoryState extends State<RecipeCategory> {
                             shape: BoxShape.circle, color: Colors.orange),
                         child:
                             const Icon(Icons.restaurant, color: Colors.white)),
-                    title: Text(listRecipeCategory[index].category ?? ''),
+                    title: Text(listRecipeCategory[index].name ?? ''),
                   );
                 },
                 separatorBuilder: (context, index) {

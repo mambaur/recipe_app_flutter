@@ -4,6 +4,6 @@ part of 'recipe_detail_bloc.dart';
 abstract class RecipeDetailEvent {}
 
 class GetRecipeDetail extends RecipeDetailEvent {
-  final String key;
-  GetRecipeDetail(this.key);
+  final int id;
+  GetRecipeDetail(this.id);
 }

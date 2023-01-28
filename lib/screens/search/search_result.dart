@@ -68,7 +68,7 @@ class _SearchResultState extends State<SearchResult> {
                         state.listRecipes[index].title != null
                             ? state.listRecipes[index].title!
                             : TextFormat.slugToTitle(
-                                state.listRecipes[index].key ?? ''),
+                                state.listRecipes[index].slug ?? ''),
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       subtitle: Wrap(
@@ -79,29 +79,29 @@ class _SearchResultState extends State<SearchResult> {
                           const SizedBox(
                             width: 3,
                           ),
-                          Text(state.listRecipes[index].times ?? '',
+                          Text(state.listRecipes[index].timeCooking ?? '',
                               style: TextStyle(
                                   fontSize: 14, color: Colors.grey.shade400)),
                           const SizedBox(
                             width: 10,
                           ),
-                          Icon(Icons.contact_support_outlined,
-                              size: 14, color: Colors.grey.shade400),
-                          const SizedBox(
-                            width: 3,
-                          ),
-                          Text(state.listRecipes[index].difficulty ?? '',
-                              style: TextStyle(
-                                  fontSize: 14, color: Colors.grey.shade400)),
-                          const SizedBox(
-                            width: 10,
-                          ),
+                          // Icon(Icons.contact_support_outlined,
+                          //     size: 14, color: Colors.grey.shade400),
+                          // const SizedBox(
+                          //   width: 3,
+                          // ),
+                          // Text(state.listRecipes[index].difficulty ?? '',
+                          //     style: TextStyle(
+                          //         fontSize: 14, color: Colors.grey.shade400)),
+                          // const SizedBox(
+                          //   width: 10,
+                          // ),
                           Icon(Icons.ramen_dining_outlined,
                               size: 14, color: Colors.grey.shade400),
                           const SizedBox(
                             width: 3,
                           ),
-                          Text(state.listRecipes[index].serving ?? '',
+                          Text(state.listRecipes[index].timeCooking ?? '',
                               style: TextStyle(
                                   fontSize: 14, color: Colors.grey.shade400)),
                         ],
@@ -118,7 +118,7 @@ class _SearchResultState extends State<SearchResult> {
                           width: 70,
                           height: 70,
                           child: CustomCachedImage.build(context,
-                              imgUrl: state.listRecipes[index].thumb ?? '',
+                              imgUrl: state.listRecipes[index].coverImage ?? '',
                               borderRadius: BorderRadius.circular(10))),
                     );
                   });

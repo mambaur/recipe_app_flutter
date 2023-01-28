@@ -23,7 +23,7 @@ class _RecipeCategoryResultState extends State<RecipeCategoryResult> {
   Future<void> _refresh() async {
     await Future.delayed(const Duration(seconds: 1));
     recipeCategoryBloc
-        .add(GetRecipeByCategory(10, true, widget.recipeCategory.key ?? ''));
+        .add(GetRecipeByCategory(10, true, widget.recipeCategory.id!));
   }
 
   BannerAd? myBanner;
@@ -46,7 +46,7 @@ class _RecipeCategoryResultState extends State<RecipeCategoryResult> {
   void initState() {
     recipeCategoryBloc = BlocProvider.of<RecipeCategoryBloc>(context);
     recipeCategoryBloc
-        .add(GetRecipeByCategory(10, true, widget.recipeCategory.key ?? ''));
+        .add(GetRecipeByCategory(10, true, widget.recipeCategory.id!));
     myBanner = BannerAd(
       // test banner
       // adUnitId: 'ca-app-pub-3940256099942544/6300978111',
@@ -71,7 +71,7 @@ class _RecipeCategoryResultState extends State<RecipeCategoryResult> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.recipeCategory.category ?? '',
+          widget.recipeCategory.name ?? '',
         ),
         centerTitle: true,
       ),
@@ -95,7 +95,7 @@ class _RecipeCategoryResultState extends State<RecipeCategoryResult> {
                             state.listRecipes[index].title != null
                                 ? state.listRecipes[index].title!
                                 : TextFormat.slugToTitle(
-                                    state.listRecipes[index].key ?? ''),
+                                    state.listRecipes[index].slug ?? ''),
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: Wrap(
@@ -106,22 +106,22 @@ class _RecipeCategoryResultState extends State<RecipeCategoryResult> {
                               const SizedBox(
                                 width: 3,
                               ),
-                              Text(state.listRecipes[index].times ?? '',
+                              Text(state.listRecipes[index].timeCooking ?? '',
                                   style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey.shade400)),
                               const SizedBox(
                                 width: 10,
                               ),
-                              Icon(Icons.contact_support,
-                                  size: 14, color: Colors.grey.shade400),
-                              const SizedBox(
-                                width: 3,
-                              ),
-                              Text(state.listRecipes[index].dificulty ?? '',
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey.shade400)),
+                              // Icon(Icons.contact_support,
+                              //     size: 14, color: Colors.grey.shade400),
+                              // const SizedBox(
+                              //   width: 3,
+                              // ),
+                              // Text(state.listRecipes[index].dificulty ?? '',
+                              //     style: TextStyle(
+                              //         fontSize: 14,
+                              //         color: Colors.grey.shade400)),
                               const SizedBox(
                                 width: 10,
                               ),
@@ -148,7 +148,8 @@ class _RecipeCategoryResultState extends State<RecipeCategoryResult> {
                               width: 70,
                               height: 70,
                               child: CustomCachedImage.build(context,
-                                  imgUrl: state.listRecipes[index].thumb ?? '',
+                                  imgUrl:
+                                      state.listRecipes[index].coverImage ?? '',
                                   borderRadius: BorderRadius.circular(10))),
                         );
                       });

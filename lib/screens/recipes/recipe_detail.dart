@@ -73,7 +73,7 @@ class _RecipeDetailState extends State<RecipeDetail> {
   @override
   void initState() {
     recipeDetailBloc = BlocProvider.of<RecipeDetailBloc>(context);
-    recipeDetailBloc.add(GetRecipeDetail(widget.recipeModel.key!));
+    recipeDetailBloc.add(GetRecipeDetail(widget.recipeModel.id!));
     myBanner = BannerAd(
       // test banner
       // adUnitId: 'ca-app-pub-3940256099942544/6300978111',
@@ -135,7 +135,7 @@ class _RecipeDetailState extends State<RecipeDetail> {
                                   const SizedBox(
                                     width: 3,
                                   ),
-                                  Text(state.recipeModel.user ?? '',
+                                  Text(state.recipeModel.user?.name ?? '',
                                       style: TextStyle(
                                           color: Colors.grey.shade400)),
                                   const SizedBox(
@@ -146,14 +146,14 @@ class _RecipeDetailState extends State<RecipeDetail> {
                                   const SizedBox(
                                     width: 3,
                                   ),
-                                  Text(state.recipeModel.datePublished ?? '',
+                                  Text(state.recipeModel.createdAt ?? '',
                                       style: TextStyle(
                                           color: Colors.grey.shade400)),
                                 ],
                               ),
                             ),
                             ReadMoreText(
-                              state.recipeModel.desc ?? '',
+                              state.recipeModel.description ?? '',
                               trimLines: 5,
                               style: const TextStyle(color: Colors.black),
                               trimMode: TrimMode.Line,
@@ -186,29 +186,29 @@ class _RecipeDetailState extends State<RecipeDetail> {
                                 const SizedBox(
                                   width: 3,
                                 ),
-                                Text(state.recipeModel.times ?? '',
+                                Text(state.recipeModel.timeCooking ?? '',
                                     style:
                                         const TextStyle(color: Colors.black)),
                                 const SizedBox(
                                   width: 10,
                                 ),
-                                Icon(Icons.contact_support_outlined,
-                                    color: Colors.orange.shade700),
-                                const SizedBox(
-                                  width: 3,
-                                ),
-                                Text(state.recipeModel.dificulty ?? '',
-                                    style:
-                                        const TextStyle(color: Colors.black)),
-                                const SizedBox(
-                                  width: 10,
-                                ),
+                                // Icon(Icons.contact_support_outlined,
+                                //     color: Colors.orange.shade700),
+                                // const SizedBox(
+                                //   width: 3,
+                                // ),
+                                // Text(state.recipeModel.dificulty ?? '',
+                                //     style:
+                                //         const TextStyle(color: Colors.black)),
+                                // const SizedBox(
+                                //   width: 10,
+                                // ),
                                 Icon(Icons.ramen_dining_outlined,
                                     color: Colors.orange.shade700),
                                 const SizedBox(
                                   width: 3,
                                 ),
-                                Text(state.recipeModel.servings ?? '',
+                                Text(state.recipeModel.portion ?? '',
                                     style:
                                         const TextStyle(color: Colors.black)),
                               ],
@@ -228,19 +228,33 @@ class _RecipeDetailState extends State<RecipeDetail> {
                             const SizedBox(
                               height: 10,
                             ),
-                            for (String ingredient
+                            for (RecipeIngredientModel ingredient
                                 in state.recipeModel.ingredients ?? [])
                               Container(
                                 margin: const EdgeInsets.only(bottom: 5),
-                                child: Row(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Icon(Icons.radio_button_unchecked),
-                                    const SizedBox(
-                                      width: 5,
-                                    ),
-                                    Expanded(
-                                      child: Text(ingredient),
-                                    )
+                                    Text((ingredient.key ?? '').toUpperCase(),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.grey.shade500,
+                                            fontSize: 16)),
+                                    const Divider(),
+                                    for (String item
+                                        in ingredient.ingredients ?? [])
+                                      Row(
+                                        children: [
+                                          const Icon(
+                                              Icons.radio_button_unchecked),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          Expanded(
+                                            child: Text(item),
+                                          )
+                                        ],
+                                      ),
                                   ],
                                 ),
                               ),
@@ -306,8 +320,8 @@ class _RecipeDetailState extends State<RecipeDetail> {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
                         return ImageViewer(
-                            imageURL: state.recipeModel.thumb ??
-                                widget.recipeModel.thumb!);
+                            imageURL: state.recipeModel.coverImage ??
+                                widget.recipeModel.coverImage!);
                       }));
                     },
                     child: Container(
@@ -318,8 +332,8 @@ class _RecipeDetailState extends State<RecipeDetail> {
                           width: size.width,
                           height: size.height * 0.55,
                           child: CustomCachedImage.build(context,
-                              imgUrl: state.recipeModel.thumb ??
-                                  widget.recipeModel.thumb),
+                              imgUrl: state.recipeModel.coverImage ??
+                                  widget.recipeModel.coverImage),
                         ),
                       ),
                     ),

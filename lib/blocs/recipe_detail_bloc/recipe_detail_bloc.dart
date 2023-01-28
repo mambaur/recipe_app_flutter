@@ -16,7 +16,7 @@ class RecipeDetailBloc extends Bloc<RecipeDetailEvent, RecipeDetailState> {
       GetRecipeDetail event, Emitter<RecipeDetailState> emit) async {
     try {
       emit(GetRecipeDetailLoading());
-      RecipeModel? data = await _recipeRepo.getRecipeDetail(event.key);
+      RecipeModel? data = await _recipeRepo.getRecipeDetail(event.id);
       if (data != null) {
         emit(RecipeDetailData(data));
       } else {

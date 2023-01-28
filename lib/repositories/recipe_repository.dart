@@ -10,11 +10,10 @@ class RecipeRepository {
 
   Future<List<RecipeModel>?> getRecipes({int page = 1}) async {
     try {
-      final response = await http.get(Uri.parse(_baseUrl + '/recipes/$page'));
-      print(response.body);
+      final response = await http.get(Uri.parse(_baseUrl + '/recipes?$page'));
 
       if (response.statusCode == 200) {
-        Iterable iterable = json.decode(response.body)['results'];
+        Iterable iterable = json.decode(response.body)['data'];
         List<RecipeModel> listRecipe =
             iterable.map((e) => RecipeModel.fromJson(e)).toList();
         return listRecipe;
@@ -26,13 +25,13 @@ class RecipeRepository {
     }
   }
 
-  Future<RecipeModel?> getRecipeDetail(String key) async {
+  Future<RecipeModel?> getRecipeDetail(int id) async {
     try {
-      final response = await http.get(Uri.parse(_baseUrl + '/recipe/$key'));
+      final response = await http.get(Uri.parse(_baseUrl + '/recipe/$id'));
       // print(response.body);
 
       if (response.statusCode == 200) {
-        return RecipeModel.fromJson(json.decode(response.body)['results']);
+        return RecipeModel.fromJson(json.decode(response.body)['data']);
       }
     } catch (e) {
       if (kDebugMode) {
@@ -43,12 +42,11 @@ class RecipeRepository {
 
   Future<List<RecipeCategoryModel>?> getRecipeCategory() async {
     try {
-      final response =
-          await http.get(Uri.parse(_baseUrl + '/categorys/recipes'));
+      final response = await http.get(Uri.parse(_baseUrl + '/categories'));
       // print(response.body);
 
       if (response.statusCode == 200) {
-        Iterable iterable = json.decode(response.body)['results'];
+        Iterable iterable = json.decode(response.body)['data'];
         List<RecipeCategoryModel> listRecipeCategory =
             iterable.map((e) => RecipeCategoryModel.fromJson(e)).toList();
         return listRecipeCategory;
@@ -61,14 +59,14 @@ class RecipeRepository {
   }
 
   Future<List<RecipeModel>?> getListRecipesbyCategory(
-      {int page = 1, String? key}) async {
+      {int page = 1, int? id}) async {
     try {
-      final response =
-          await http.get(Uri.parse(_baseUrl + '/recipes/$key?page=$page'));
+      final response = await http.get(
+          Uri.parse(_baseUrl + '/recipes?page=$page&categories[]=${id ?? ''}'));
       // print(response.body);
 
       if (response.statusCode == 200) {
-        Iterable iterable = json.decode(response.body)['results'];
+        Iterable iterable = json.decode(response.body)['data'];
         List<RecipeModel> listRecipe =
             iterable.map((e) => RecipeModel.fromJson(e)).toList();
         return listRecipe;
@@ -83,11 +81,11 @@ class RecipeRepository {
   Future<List<RecipeModel>?> getSearchRecipes({String? keyword}) async {
     try {
       final response =
-          await http.get(Uri.parse(_baseUrl + '/search/?q=$keyword'));
+          await http.get(Uri.parse(_baseUrl + '/recipes?q=$keyword'));
       // print(response.body);
 
       if (response.statusCode == 200) {
-        Iterable iterable = json.decode(response.body)['results'];
+        Iterable iterable = json.decode(response.body)['data'];
         List<RecipeModel> listRecipe =
             iterable.map((e) => RecipeModel.fromJson(e)).toList();
         return listRecipe;

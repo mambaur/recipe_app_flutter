@@ -4,8 +4,7 @@ part of 'recipe_category_bloc.dart';
 abstract class RecipeCategoryEvent {}
 
 class GetRecipeByCategory extends RecipeCategoryEvent {
-  final String key;
-  final int limit;
+  final int limit, id;
   final bool isInit;
-  GetRecipeByCategory(this.limit, this.isInit, this.key);
+  GetRecipeByCategory(this.limit, this.isInit, this.id);
 }
