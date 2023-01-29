@@ -1,9 +1,14 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_controller.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:recipe_app/blocs/recipe_bloc/recipe_bloc.dart';
+import 'package:recipe_app/models/recipe_model.dart';
+import 'package:recipe_app/repositories/recipe_repository.dart';
 import 'package:recipe_app/screens/about/about_screen.dart';
 import 'package:recipe_app/screens/recipes/recipe_category.dart';
 import 'package:recipe_app/screens/recipes/recipe_detail.dart';
@@ -22,6 +27,7 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  final RecipeRepository _recipeRepo = RecipeRepository();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late RecipeBloc recipeBloc;
   final ScrollController _scrollController = ScrollController();
@@ -59,6 +65,17 @@ class _DashboardState extends State<Dashboard> {
     if (!await launchUrl(Uri.parse(_url))) throw 'Could not launch $_url';
   }
 
+  final List<String> imgList = [
+    'https://masakin.caraguna.com/storage/recipe_images/zEdB44aKqERJHWogplgbvxOxmv7jWirRBI6ELi21.jpg',
+    'https://masakin.caraguna.com/storage/recipe_images/Su6BvbLaX4u4KqGeLmx8x2MqCGMSMlR4yVsOUS61.jpg',
+    'https://masakin.caraguna.com/storage/recipe_images/SoTT0ZdG4DJ7iwp6OvX1SzEwmm0tvVGzs1Qow4Me.jpg'
+  ];
+
+  final CarouselController _controller = CarouselController();
+
+  late Future<List<RecipeModel>?> topBookmarks;
+  late Future<List<RecipeModel>?> topViews;
+
   BannerAd? myBanner;
 
   StatusAd statusAd = StatusAd.initial;
@@ -93,6 +110,9 @@ class _DashboardState extends State<Dashboard> {
     );
     myBanner!.load();
     super.initState();
+
+    topBookmarks = _recipeRepo.getTopBookmarkRecipes();
+    topViews = _recipeRepo.getTopViewRecipes();
   }
 
   @override
@@ -197,152 +217,510 @@ class _DashboardState extends State<Dashboard> {
                 color: Colors.orangeAccent.shade700,
                 displacement: 20,
                 onRefresh: () => _refresh(),
-                child: BlocBuilder<RecipeBloc, RecipeState>(
-                  builder: (context, state) {
-                    if (state is RecipeData) {
-                      return ListView.separated(
-                        controller: _scrollController,
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.only(bottom: 10),
-                        itemCount: state.hasReachMax
-                            ? state.listRecipes.length
-                            : state.listRecipes.length + 1,
-                        itemBuilder: (context, index) {
-                          if (index < state.listRecipes.length) {
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) {
-                                  return RecipeDetail(
-                                    recipeModel: state.listRecipes[index],
-                                  );
-                                }));
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.only(bottom: 10),
-                                child: Wrap(
-                                  children: [
-                                    SizedBox(
-                                      width: size.width,
-                                      height: size.height * 0.3,
-                                      child: CustomCachedImage.build(context,
-                                          imgUrl: state
-                                              .listRecipes[index].coverImage),
+                child: CustomScrollView(
+                    controller: _scrollController,
+                    physics: const AlwaysScrollableScrollPhysics(
+                        parent: BouncingScrollPhysics()),
+                    slivers: [
+                      SliverList(
+                          delegate: SliverChildListDelegate([
+                        FutureBuilder<List<RecipeModel>?>(
+                            future: topBookmarks,
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return Container(
+                                  margin: const EdgeInsets.only(top: 10),
+                                  width: MediaQuery.of(context).size.width,
+                                  child: CarouselSlider(
+                                    items: snapshot.data!
+                                        .map((item) => Container(
+                                              margin: const EdgeInsets.all(5.0),
+                                              child: ClipRRect(
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(5.0)),
+                                                  child: Stack(
+                                                    children: <Widget>[
+                                                      Image.network(
+                                                          item.coverImage ?? '',
+                                                          fit: BoxFit.cover,
+                                                          width: 1000.0),
+                                                      Positioned(
+                                                        bottom: 0.0,
+                                                        left: 0.0,
+                                                        right: 0.0,
+                                                        child: Container(
+                                                          decoration:
+                                                              const BoxDecoration(
+                                                            gradient:
+                                                                LinearGradient(
+                                                              colors: [
+                                                                Color.fromARGB(
+                                                                    200,
+                                                                    0,
+                                                                    0,
+                                                                    0),
+                                                                Color.fromARGB(
+                                                                    0, 0, 0, 0)
+                                                              ],
+                                                              begin: Alignment
+                                                                  .bottomCenter,
+                                                              end: Alignment
+                                                                  .topCenter,
+                                                            ),
+                                                          ),
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .symmetric(
+                                                                  vertical:
+                                                                      10.0,
+                                                                  horizontal:
+                                                                      20.0),
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Text(
+                                                                item.title ??
+                                                                    '',
+                                                                style:
+                                                                    const TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  // fontSize: 20.0,
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .only(
+                                                                        top:
+                                                                            8.0),
+                                                                child: Wrap(
+                                                                  crossAxisAlignment:
+                                                                      WrapCrossAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    SizedBox(
+                                                                      width: 25,
+                                                                      height:
+                                                                          25,
+                                                                      child:
+                                                                          ClipOval(
+                                                                        child:
+                                                                            CachedNetworkImage(
+                                                                          imageUrl:
+                                                                              item.user?.photo ?? '',
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    const SizedBox(
+                                                                      width: 10,
+                                                                    ),
+                                                                    Text(
+                                                                        item.user?.name ??
+                                                                            '',
+                                                                        style: const TextStyle(
+                                                                            color:
+                                                                                Colors.white))
+                                                                  ],
+                                                                ),
+                                                              )
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )),
+                                            ))
+                                        .toList(),
+                                    carouselController: _controller,
+                                    options: CarouselOptions(
+                                      autoPlay: true,
+                                      enlargeCenterPage: true,
+                                      // aspectRatio: 1,
+                                      // onPageChanged: (index, reason) {
+                                      //   setState(() {
+                                      //     _current = index;
+                                      //   });
+                                      // }
                                     ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 10),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Icon(Icons.timer_outlined,
-                                                  size: 20,
-                                                  color:
-                                                      Colors.orange.shade700),
-                                              const SizedBox(
-                                                width: 3,
+                                  ),
+                                );
+                              } else {
+                                return const SizedBox();
+                              }
+                            }),
+                      ])),
+                      SliverList(
+                          delegate: SliverChildListDelegate([
+                        const Padding(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 15, horizontal: 10),
+                          child: Text(
+                            'Resep Populer',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        FutureBuilder<List<RecipeModel>?>(
+                            future: topViews,
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return SizedBox(
+                                  height: 100,
+                                  child: ListView.builder(
+                                    physics: const BouncingScrollPhysics(),
+                                    scrollDirection: Axis.horizontal,
+                                    shrinkWrap: true,
+                                    itemCount: snapshot.data!.length,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10),
+                                    itemBuilder: (context, index) {
+                                      return Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.8,
+                                        margin:
+                                            const EdgeInsets.only(right: 10),
+                                        decoration: BoxDecoration(
+                                            color: Colors.grey.shade200,
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
+                                        height: 100,
+                                        child: Row(children: [
+                                          SizedBox(
+                                            width: 100,
+                                            height: 100,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                      topLeft:
+                                                          Radius.circular(5),
+                                                      bottomLeft:
+                                                          Radius.circular(5)),
+                                              child: CachedNetworkImage(
+                                                fit: BoxFit.cover,
+                                                imageUrl: snapshot.data![index]
+                                                        .coverImage ??
+                                                    '',
                                               ),
-                                              Text(
-                                                  state.listRecipes[index]
-                                                          .timeCooking ??
-                                                      '',
-                                                  style: const TextStyle(
-                                                      fontSize: 12)),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              // const Icon(
-                                              //     Icons
-                                              //         .contact_support_outlined,
-                                              //     size: 20),
-                                              // const SizedBox(
-                                              //   width: 3,
-                                              // ),
-                                              // Text(
-                                              //     state.listRecipes[index]
-                                              //             .portion ??
-                                              //         '',
-                                              //     style: const TextStyle(
-                                              //         fontSize: 12)),
-                                              // const SizedBox(
-                                              //   width: 10,
-                                              // ),
-                                              Icon(Icons.ramen_dining_outlined,
-                                                  size: 20,
-                                                  color:
-                                                      Colors.orange.shade700),
-                                              const SizedBox(
-                                                width: 3,
-                                              ),
-                                              Text(
-                                                  state.listRecipes[index]
-                                                          .portion ??
-                                                      '',
-                                                  style: const TextStyle(
-                                                      fontSize: 12)),
-                                            ],
+                                            ),
                                           ),
                                           const SizedBox(
-                                            height: 5,
+                                            width: 10,
                                           ),
-                                          Text(
-                                            state.listRecipes[index].title !=
-                                                    null
-                                                ? state
-                                                    .listRecipes[index].title!
-                                                : TextFormat.slugToTitle(state
-                                                        .listRecipes[index]
-                                                        .slug ??
-                                                    ''),
-                                            style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  snapshot.data![index].title ??
+                                                      '',
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 8.5),
+                                                  child: Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      SizedBox(
+                                                        width: 25,
+                                                        height: 25,
+                                                        child: ClipOval(
+                                                          child:
+                                                              CachedNetworkImage(
+                                                            imageUrl: snapshot
+                                                                    .data![
+                                                                        index]
+                                                                    .user
+                                                                    ?.photo ??
+                                                                '',
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      Expanded(
+                                                        child: Text(
+                                                            snapshot
+                                                                    .data?[
+                                                                        index]
+                                                                    .user
+                                                                    ?.name ??
+                                                                '',
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis),
+                                                      )
+                                                    ],
+                                                  ),
+                                                )
+                                              ],
+                                            ),
                                           )
-                                        ],
+                                        ]),
+                                      );
+                                    },
+                                  ),
+                                );
+                              } else {
+                                return const SizedBox();
+                              }
+                            })
+                      ])),
+                      SliverList(
+                          delegate: SliverChildListDelegate([
+                        const Padding(
+                          padding:
+                              EdgeInsets.only(top: 15, left: 10, right: 10),
+                          child: Text(
+                            'Semua Resep',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        BlocBuilder<RecipeBloc, RecipeState>(
+                          builder: (context, state) {
+                            if (state is RecipeData) {
+                              return ListView.separated(
+                                physics: const NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                padding: const EdgeInsets.all(10),
+                                itemCount: state.hasReachMax
+                                    ? state.listRecipes.length
+                                    : state.listRecipes.length + 1,
+                                itemBuilder: (context, index) {
+                                  if (index < state.listRecipes.length) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(context,
+                                            MaterialPageRoute(
+                                                builder: (context) {
+                                          return RecipeDetail(
+                                            recipeModel:
+                                                state.listRecipes[index],
+                                          );
+                                        }));
+                                      },
+                                      child: Container(
+                                        margin:
+                                            const EdgeInsets.only(bottom: 10),
+                                        child: Card(
+                                          child: Wrap(
+                                            children: [
+                                              SizedBox(
+                                                width: size.width,
+                                                height: size.height * 0.3,
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      const BorderRadius.only(
+                                                          topLeft:
+                                                              Radius.circular(
+                                                                  5),
+                                                          topRight:
+                                                              Radius.circular(
+                                                                  5)),
+                                                  child:
+                                                      CustomCachedImage.build(
+                                                          context,
+                                                          imgUrl: state
+                                                              .listRecipes[
+                                                                  index]
+                                                              .coverImage),
+                                                ),
+                                              ),
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 10,
+                                                        horizontal: 10),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Icon(
+                                                            Icons
+                                                                .timer_outlined,
+                                                            size: 20,
+                                                            color: Colors.orange
+                                                                .shade700),
+                                                        const SizedBox(
+                                                          width: 3,
+                                                        ),
+                                                        Text(
+                                                            state
+                                                                    .listRecipes[
+                                                                        index]
+                                                                    .timeCooking ??
+                                                                '',
+                                                            style:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        12)),
+                                                        const SizedBox(
+                                                          width: 10,
+                                                        ),
+                                                        Icon(
+                                                            Icons
+                                                                .ramen_dining_outlined,
+                                                            size: 20,
+                                                            color: Colors.orange
+                                                                .shade700),
+                                                        const SizedBox(
+                                                          width: 3,
+                                                        ),
+                                                        Text(
+                                                            state
+                                                                    .listRecipes[
+                                                                        index]
+                                                                    .portion ??
+                                                                '',
+                                                            style:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        12)),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 5,
+                                                    ),
+                                                    Text(
+                                                      state.listRecipes[index]
+                                                                  .title !=
+                                                              null
+                                                          ? state
+                                                              .listRecipes[
+                                                                  index]
+                                                              .title!
+                                                          : TextFormat
+                                                              .slugToTitle(state
+                                                                      .listRecipes[
+                                                                          index]
+                                                                      .slug ??
+                                                                  ''),
+                                                      style: const TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    Text(
+                                                      state.listRecipes[index]
+                                                              .description ??
+                                                          '',
+                                                      style: const TextStyle(
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 8.0),
+                                                      child: Wrap(
+                                                        crossAxisAlignment:
+                                                            WrapCrossAlignment
+                                                                .center,
+                                                        children: [
+                                                          SizedBox(
+                                                            width: 25,
+                                                            height: 25,
+                                                            child: ClipOval(
+                                                              child:
+                                                                  CachedNetworkImage(
+                                                                imageUrl: state
+                                                                        .listRecipes[
+                                                                            index]
+                                                                        .user
+                                                                        ?.photo ??
+                                                                    '',
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 10,
+                                                          ),
+                                                          Text(state
+                                                                  .listRecipes[
+                                                                      index]
+                                                                  .user
+                                                                  ?.name ??
+                                                              '')
+                                                        ],
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
                                       ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            );
-                          } else {
-                            return Center(
-                              child: SizedBox(
-                                width: 30,
-                                height: 30,
-                                child: CircularProgressIndicator(
-                                    color: Colors.orange.shade600,
-                                    strokeWidth: 2),
-                              ),
-                            );
-                          }
-                        },
-                        separatorBuilder: (BuildContext context, int index) {
-                          return Container();
-                        },
-                      );
-                    } else {
-                      return Center(
-                          child: SizedBox(
-                        width: 30,
-                        height: 30,
-                        child: CircularProgressIndicator(
-                            color: Colors.orange.shade600, strokeWidth: 3),
-                      ));
-                    }
-                  },
-                ),
+                                    );
+                                  } else {
+                                    return Center(
+                                      child: SizedBox(
+                                        width: 30,
+                                        height: 30,
+                                        child: CircularProgressIndicator(
+                                            color: Colors.orange.shade600,
+                                            strokeWidth: 2),
+                                      ),
+                                    );
+                                  }
+                                },
+                                separatorBuilder:
+                                    (BuildContext context, int index) {
+                                  return Container();
+                                },
+                              );
+                            } else {
+                              return Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: Center(
+                                    child: SizedBox(
+                                  width: 30,
+                                  height: 30,
+                                  child: CircularProgressIndicator(
+                                      color: Colors.orange.shade600,
+                                      strokeWidth: 3),
+                                )),
+                              );
+                            }
+                          },
+                        )
+                      ])),
+                      SliverList(delegate: SliverChildListDelegate([])),
+                    ]),
               ),
               Positioned(
                   child: Align(
                       alignment: Alignment.bottomCenter,
                       child: statusAd == StatusAd.loaded
                           ? Container(
-                              margin:
-                                  EdgeInsets.only(top: 10, left: 10, right: 10),
+                              margin: const EdgeInsets.only(
+                                  top: 10, left: 10, right: 10),
                               alignment: Alignment.center,
                               child: AdWidget(ad: myBanner!),
                               width: myBanner!.size.width.toDouble(),

@@ -25,6 +25,42 @@ class RecipeRepository {
     }
   }
 
+  Future<List<RecipeModel>?> getTopBookmarkRecipes() async {
+    try {
+      final response =
+          await http.get(Uri.parse(_baseUrl + '/recipes/top-bookmarks'));
+
+      if (response.statusCode == 200) {
+        Iterable iterable = json.decode(response.body)['data'];
+        List<RecipeModel> listRecipe =
+            iterable.map((e) => RecipeModel.fromJson(e)).toList();
+        return listRecipe;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+    }
+  }
+
+  Future<List<RecipeModel>?> getTopViewRecipes() async {
+    try {
+      final response =
+          await http.get(Uri.parse(_baseUrl + '/recipes/top-views'));
+
+      if (response.statusCode == 200) {
+        Iterable iterable = json.decode(response.body)['data'];
+        List<RecipeModel> listRecipe =
+            iterable.map((e) => RecipeModel.fromJson(e)).toList();
+        return listRecipe;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+    }
+  }
+
   Future<RecipeModel?> getRecipeDetail(int id) async {
     try {
       final response = await http.get(Uri.parse(_baseUrl + '/recipe/$id'));
