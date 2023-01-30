@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -231,29 +232,40 @@ class _RecipeDetailState extends State<RecipeDetail> {
                             for (RecipeIngredientModel ingredient
                                 in state.recipeModel.ingredients ?? [])
                               Container(
-                                margin: const EdgeInsets.only(bottom: 5),
+                                margin: const EdgeInsets.only(bottom: 10),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text((ingredient.key ?? '').toUpperCase(),
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            color: Colors.grey.shade500,
-                                            fontSize: 16)),
-                                    const Divider(),
+                                            color: Colors.orange.shade700,
+                                            fontSize: 12)),
+                                    const Divider(
+                                      thickness: 0.5,
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
                                     for (String item
                                         in ingredient.ingredients ?? [])
-                                      Row(
-                                        children: [
-                                          const Icon(
-                                              Icons.radio_button_unchecked),
-                                          const SizedBox(
-                                            width: 5,
-                                          ),
-                                          Expanded(
-                                            child: Text(item),
-                                          )
-                                        ],
+                                      Container(
+                                        margin:
+                                            const EdgeInsets.only(bottom: 10),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Icon(
+                                                Icons.radio_button_unchecked),
+                                            const SizedBox(
+                                              width: 5,
+                                            ),
+                                            Expanded(
+                                              child: Text(item),
+                                            )
+                                          ],
+                                        ),
                                       ),
                                   ],
                                 ),
@@ -277,10 +289,67 @@ class _RecipeDetailState extends State<RecipeDetail> {
                             const SizedBox(
                               height: 15,
                             ),
+                            const Divider(
+                              thickness: 0.5,
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            const Text("Foto Resep",
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold)),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.25,
+                                child: ListView.builder(
+                                  physics: const AlwaysScrollableScrollPhysics(
+                                      parent: BouncingScrollPhysics()),
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount:
+                                      (state.recipeModel.images ?? []).length,
+                                  itemBuilder: (context, index) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(context,
+                                            MaterialPageRoute(
+                                                builder: (context) {
+                                          return ImageViewer(
+                                              imageURL: state
+                                                  .recipeModel.images![index]);
+                                        }));
+                                      },
+                                      child: Container(
+                                        margin:
+                                            const EdgeInsets.only(right: 15),
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.8,
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.25,
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          child: CachedNetworkImage(
+                                            fit: BoxFit.cover,
+                                            imageUrl: state
+                                                .recipeModel.images![index],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                )),
+                            const SizedBox(
+                              height: 15,
+                            ),
                             Center(
                               child: statusAd == StatusAd.loaded
                                   ? Container(
-                                      margin: EdgeInsets.only(
+                                      margin: const EdgeInsets.only(
                                           top: 10, left: 10, right: 10),
                                       alignment: Alignment.center,
                                       child: AdWidget(ad: myBanner!),
@@ -338,25 +407,51 @@ class _RecipeDetailState extends State<RecipeDetail> {
                       ),
                     ),
                   ),
+                  // SafeArea(
+                  //     child: ListTile(
+                  //   leading: IconButton(
+                  //       onPressed: () => Navigator.pop(context),
+                  //       icon: const Icon(
+                  //         Icons.arrow_back,
+                  //         color: Colors.white,
+                  //       )),
+                  //   title: Text(
+                  //     "Detail Resep",
+                  //     style: TextStyle(
+                  //         color: Colors.white,
+                  //         fontSize: 16,
+                  //         fontWeight: FontWeight.bold),
+                  //   ),
+                  // )),
                   SafeArea(
                     child: Row(
                       children: [
-                        IconButton(
-                            onPressed: () => Navigator.pop(context),
-                            icon: const Icon(
-                              Icons.arrow_back,
-                              color: Colors.white,
-                            )),
-                        SizedBox(
-                          width: 10,
+                        Container(
+                          margin: EdgeInsets.only(left: 10, top: 10),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.black.withOpacity(0.2),
+                          ),
+                          child: IconButton(
+                              onPressed: () => Navigator.pop(context),
+                              icon: const Icon(
+                                Icons.chevron_left,
+                                color: Colors.white,
+                              )),
                         ),
-                        Text(
-                          "Detail Resep",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold),
-                        ),
+                        // const SizedBox(
+                        //   width: 10,
+                        // ),
+                        // Expanded(
+                        //   child: const Text(
+                        //     "Detail Resep",
+                        //     textAlign: TextAlign.center,
+                        //     style: TextStyle(
+                        //         color: Colors.white,
+                        //         fontSize: 16,
+                        //         fontWeight: FontWeight.bold),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),

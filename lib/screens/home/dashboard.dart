@@ -233,112 +233,131 @@ class _DashboardState extends State<Dashboard> {
                                   width: MediaQuery.of(context).size.width,
                                   child: CarouselSlider(
                                     items: snapshot.data!
-                                        .map((item) => Container(
-                                              margin: const EdgeInsets.all(5.0),
-                                              child: ClipRRect(
-                                                  borderRadius:
-                                                      const BorderRadius.all(
-                                                          Radius.circular(5.0)),
-                                                  child: Stack(
-                                                    children: <Widget>[
-                                                      Image.network(
-                                                          item.coverImage ?? '',
-                                                          fit: BoxFit.cover,
-                                                          width: 1000.0),
-                                                      Positioned(
-                                                        bottom: 0.0,
-                                                        left: 0.0,
-                                                        right: 0.0,
-                                                        child: Container(
-                                                          decoration:
-                                                              const BoxDecoration(
-                                                            gradient:
-                                                                LinearGradient(
-                                                              colors: [
-                                                                Color.fromARGB(
-                                                                    200,
-                                                                    0,
-                                                                    0,
-                                                                    0),
-                                                                Color.fromARGB(
-                                                                    0, 0, 0, 0)
-                                                              ],
-                                                              begin: Alignment
-                                                                  .bottomCenter,
-                                                              end: Alignment
-                                                                  .topCenter,
-                                                            ),
-                                                          ),
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .symmetric(
-                                                                  vertical:
-                                                                      10.0,
-                                                                  horizontal:
-                                                                      20.0),
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Text(
-                                                                item.title ??
-                                                                    '',
-                                                                style:
-                                                                    const TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  // fontSize: 20.0,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
+                                        .map((item) => GestureDetector(
+                                              onTap: () {
+                                                Navigator.push(context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) {
+                                                  return RecipeDetail(
+                                                    recipeModel: item,
+                                                  );
+                                                }));
+                                              },
+                                              child: Container(
+                                                margin:
+                                                    const EdgeInsets.all(5.0),
+                                                child: ClipRRect(
+                                                    borderRadius:
+                                                        const BorderRadius.all(
+                                                            Radius.circular(
+                                                                5.0)),
+                                                    child: Stack(
+                                                      children: <Widget>[
+                                                        Image.network(
+                                                            item.coverImage ??
+                                                                '',
+                                                            fit: BoxFit.cover,
+                                                            width: 1000.0),
+                                                        Positioned(
+                                                          bottom: 0.0,
+                                                          left: 0.0,
+                                                          right: 0.0,
+                                                          child: Container(
+                                                            decoration:
+                                                                const BoxDecoration(
+                                                              gradient:
+                                                                  LinearGradient(
+                                                                colors: [
+                                                                  Color
+                                                                      .fromARGB(
+                                                                          200,
+                                                                          0,
+                                                                          0,
+                                                                          0),
+                                                                  Color
+                                                                      .fromARGB(
+                                                                          0,
+                                                                          0,
+                                                                          0,
+                                                                          0)
+                                                                ],
+                                                                begin: Alignment
+                                                                    .bottomCenter,
+                                                                end: Alignment
+                                                                    .topCenter,
                                                               ),
-                                                              Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                            .only(
-                                                                        top:
-                                                                            8.0),
-                                                                child: Wrap(
-                                                                  crossAxisAlignment:
-                                                                      WrapCrossAlignment
-                                                                          .center,
-                                                                  children: [
-                                                                    SizedBox(
-                                                                      width: 25,
-                                                                      height:
-                                                                          25,
-                                                                      child:
-                                                                          ClipOval(
+                                                            ),
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .symmetric(
+                                                                    vertical:
+                                                                        10.0,
+                                                                    horizontal:
+                                                                        20.0),
+                                                            child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  item.title ??
+                                                                      '',
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontSize:
+                                                                        16,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                  ),
+                                                                ),
+                                                                Padding(
+                                                                  padding: const EdgeInsets
+                                                                          .only(
+                                                                      top: 8.0),
+                                                                  child: Wrap(
+                                                                    crossAxisAlignment:
+                                                                        WrapCrossAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      SizedBox(
+                                                                        width:
+                                                                            25,
+                                                                        height:
+                                                                            25,
                                                                         child:
-                                                                            CachedNetworkImage(
-                                                                          imageUrl:
-                                                                              item.user?.photo ?? '',
+                                                                            ClipOval(
+                                                                          child:
+                                                                              CachedNetworkImage(
+                                                                            imageUrl:
+                                                                                item.user?.photo ?? '',
+                                                                          ),
                                                                         ),
                                                                       ),
-                                                                    ),
-                                                                    const SizedBox(
-                                                                      width: 10,
-                                                                    ),
-                                                                    Text(
-                                                                        item.user?.name ??
-                                                                            '',
-                                                                        style: const TextStyle(
-                                                                            color:
-                                                                                Colors.white))
-                                                                  ],
-                                                                ),
-                                                              )
-                                                            ],
+                                                                      const SizedBox(
+                                                                        width:
+                                                                            10,
+                                                                      ),
+                                                                      Text(
+                                                                          item.user?.name ??
+                                                                              '',
+                                                                          style:
+                                                                              const TextStyle(color: Colors.white))
+                                                                    ],
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  )),
+                                                      ],
+                                                    )),
+                                              ),
                                             ))
                                         .toList(),
                                     carouselController: _controller,
@@ -361,9 +380,11 @@ class _DashboardState extends State<Dashboard> {
                       ])),
                       SliverList(
                           delegate: SliverChildListDelegate([
+                        const SizedBox(
+                          height: 15,
+                        ),
                         const Padding(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 15, horizontal: 10),
+                          padding: EdgeInsets.symmetric(horizontal: 10),
                           child: Text(
                             'Resep Populer',
                             style: TextStyle(
@@ -371,12 +392,15 @@ class _DashboardState extends State<Dashboard> {
                             ),
                           ),
                         ),
+                        const SizedBox(
+                          height: 5,
+                        ),
                         FutureBuilder<List<RecipeModel>?>(
                             future: topViews,
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
                                 return SizedBox(
-                                  height: 100,
+                                  height: 120,
                                   child: ListView.builder(
                                     physics: const BouncingScrollPhysics(),
                                     scrollDirection: Axis.horizontal,
@@ -385,99 +409,128 @@ class _DashboardState extends State<Dashboard> {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 10),
                                     itemBuilder: (context, index) {
-                                      return Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.8,
-                                        margin:
-                                            const EdgeInsets.only(right: 10),
-                                        decoration: BoxDecoration(
-                                            color: Colors.grey.shade200,
-                                            borderRadius:
-                                                BorderRadius.circular(5)),
-                                        height: 100,
-                                        child: Row(children: [
-                                          SizedBox(
-                                            width: 100,
-                                            height: 100,
-                                            child: ClipRRect(
+                                      return GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(context,
+                                              MaterialPageRoute(
+                                                  builder: (context) {
+                                            return RecipeDetail(
+                                              recipeModel:
+                                                  snapshot.data![index],
+                                            );
+                                          }));
+                                        },
+                                        child: Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.8,
+                                          margin: const EdgeInsets.only(
+                                              right: 15, top: 10, bottom: 10),
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.grey
+                                                      .withOpacity(0.5),
+                                                  spreadRadius: 2,
+                                                  blurRadius: 3,
+                                                  offset: const Offset(0,
+                                                      1), // changes position of shadow
+                                                ),
+                                              ],
                                               borderRadius:
-                                                  const BorderRadius.only(
-                                                      topLeft:
-                                                          Radius.circular(5),
-                                                      bottomLeft:
-                                                          Radius.circular(5)),
-                                              child: CachedNetworkImage(
-                                                fit: BoxFit.cover,
-                                                imageUrl: snapshot.data![index]
-                                                        .coverImage ??
-                                                    '',
+                                                  BorderRadius.circular(5)),
+                                          height: 100,
+                                          child: Row(children: [
+                                            SizedBox(
+                                              width: 100,
+                                              height: 100,
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    const BorderRadius.only(
+                                                        topLeft:
+                                                            Radius.circular(5),
+                                                        bottomLeft:
+                                                            Radius.circular(5)),
+                                                child: CachedNetworkImage(
+                                                  fit: BoxFit.cover,
+                                                  imageUrl: snapshot
+                                                          .data![index]
+                                                          .coverImage ??
+                                                      '',
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Text(
-                                                  snapshot.data![index].title ??
-                                                      '',
-                                                  style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          top: 8.5),
-                                                  child: Row(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      SizedBox(
-                                                        width: 25,
-                                                        height: 25,
-                                                        child: ClipOval(
-                                                          child:
-                                                              CachedNetworkImage(
-                                                            imageUrl: snapshot
-                                                                    .data![
-                                                                        index]
-                                                                    .user
-                                                                    ?.photo ??
-                                                                '',
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    snapshot.data![index]
+                                                            .title ??
+                                                        '',
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    maxLines: 2,
+                                                    style: const TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 8.5),
+                                                    child: Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        SizedBox(
+                                                          width: 25,
+                                                          height: 25,
+                                                          child: ClipOval(
+                                                            child:
+                                                                CachedNetworkImage(
+                                                              imageUrl: snapshot
+                                                                      .data![
+                                                                          index]
+                                                                      .user
+                                                                      ?.photo ??
+                                                                  '',
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                      const SizedBox(
-                                                        width: 10,
-                                                      ),
-                                                      Expanded(
-                                                        child: Text(
-                                                            snapshot
-                                                                    .data?[
-                                                                        index]
-                                                                    .user
-                                                                    ?.name ??
-                                                                '',
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis),
-                                                      )
-                                                    ],
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          )
-                                        ]),
+                                                        const SizedBox(
+                                                          width: 10,
+                                                        ),
+                                                        Expanded(
+                                                          child: Text(
+                                                              snapshot
+                                                                      .data?[
+                                                                          index]
+                                                                      .user
+                                                                      ?.name ??
+                                                                  '',
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            )
+                                          ]),
+                                        ),
                                       );
                                     },
                                   ),

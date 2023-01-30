@@ -10,7 +10,8 @@ class RecipeRepository {
 
   Future<List<RecipeModel>?> getRecipes({int page = 1}) async {
     try {
-      final response = await http.get(Uri.parse(_baseUrl + '/recipes?$page'));
+      final response =
+          await http.get(Uri.parse(_baseUrl + '/recipes?page=$page'));
 
       if (response.statusCode == 200) {
         Iterable iterable = json.decode(response.body)['data'];
