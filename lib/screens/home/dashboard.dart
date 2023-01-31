@@ -35,6 +35,8 @@ class _DashboardState extends State<Dashboard> {
   final String _urlGooglePlay =
       'https://play.google.com/store/apps/details?id=com.caraguna.recipe_apps';
   final String _recipeWebUrl = 'https://masakin.caraguna.com';
+  final String _otherAppsUrl =
+      'https://play.google.com/store/apps/dev?id=8918426189046119136&hl=en';
 
   /// Set default hasReachMax value false
   /// Variabel ini digunakan untuk menangani agaer scrollController tidak-
@@ -62,7 +64,10 @@ class _DashboardState extends State<Dashboard> {
   }
 
   void _launchUrl(String _url) async {
-    if (!await launchUrl(Uri.parse(_url))) throw 'Could not launch $_url';
+    if (!await launchUrl(Uri.parse(_url),
+        mode: LaunchMode.externalApplication)) {
+      throw 'Could not launch $_url';
+    }
   }
 
   final List<String> imgList = [
@@ -206,7 +211,13 @@ class _DashboardState extends State<Dashboard> {
                       _launchUrl(_recipeWebUrl);
                     },
                     title: const Text("Bagikan Resepmu")),
-                ListTile(onTap: () {}, title: Text(version)),
+                ListTile(
+                    onTap: () {
+                      _scaffoldKey.currentState?.openEndDrawer();
+                      _launchUrl(_otherAppsUrl);
+                    },
+                    title: const Text("Aplikasi Lainnya")),
+                ListTile(onTap: () {}, title: Text("Version $version")),
               ]),
             ),
           ),
@@ -253,11 +264,16 @@ class _DashboardState extends State<Dashboard> {
                                                                 5.0)),
                                                     child: Stack(
                                                       children: <Widget>[
-                                                        Image.network(
-                                                            item.coverImage ??
-                                                                '',
+                                                        CachedNetworkImage(
+                                                            imageUrl:
+                                                                item.coverImage ??
+                                                                    '',
                                                             fit: BoxFit.cover,
-                                                            width: 1000.0),
+                                                            width:
+                                                                MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width),
                                                         Positioned(
                                                           bottom: 0.0,
                                                           left: 0.0,
@@ -364,7 +380,7 @@ class _DashboardState extends State<Dashboard> {
                                     options: CarouselOptions(
                                       autoPlay: true,
                                       enlargeCenterPage: true,
-                                      // aspectRatio: 1,
+                                      aspectRatio: 2,
                                       // onPageChanged: (index, reason) {
                                       //   setState(() {
                                       //     _current = index;
@@ -432,7 +448,7 @@ class _DashboardState extends State<Dashboard> {
                                               boxShadow: [
                                                 BoxShadow(
                                                   color: Colors.grey
-                                                      .withOpacity(0.5),
+                                                      .withOpacity(0.3),
                                                   spreadRadius: 2,
                                                   blurRadius: 3,
                                                   offset: const Offset(0,
