@@ -9,6 +9,7 @@ import 'package:recipe_app/models/recipe_model.dart';
 import 'package:recipe_app/utils/custom_cached_image.dart';
 import 'package:recipe_app/utils/image_viewer.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 enum StatusAd { initial, loaded }
 
@@ -44,6 +45,13 @@ class _RecipeDetailState extends State<RecipeDetail> {
     List<String> listWord = word.split(' ');
     listWord.removeAt(0);
     return listWord.join(" ");
+  }
+
+  void _launchUrl(String _url) async {
+    if (!await launchUrl(Uri.parse(_url),
+        mode: LaunchMode.externalApplication)) {
+      throw 'Could not launch $_url';
+    }
   }
 
   Widget stepWidget(List<String> steps) {
@@ -131,8 +139,18 @@ class _RecipeDetailState extends State<RecipeDetail> {
                               margin: const EdgeInsets.symmetric(vertical: 10),
                               child: Row(
                                 children: [
-                                  Icon(Icons.account_circle_rounded,
-                                      color: Colors.grey.shade400),
+                                  SizedBox(
+                                    width: 25,
+                                    height: 25,
+                                    child: ClipOval(
+                                      child: CachedNetworkImage(
+                                        imageUrl:
+                                            state.recipeModel.user?.photo ?? '',
+                                      ),
+                                    ),
+                                  ),
+                                  // Icon(Icons.account_circle_rounded,
+                                  //     color: Colors.grey.shade400),
                                   const SizedBox(
                                     width: 3,
                                   ),
@@ -346,6 +364,53 @@ class _RecipeDetailState extends State<RecipeDetail> {
                             const SizedBox(
                               height: 15,
                             ),
+                            const Divider(
+                              thickness: 0.5,
+                            ),
+                            state.recipeModel.youtubeUrl != null
+                                ? Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      const Text("Video Resep",
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold)),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      ListTile(
+                                        onTap: () {
+                                          _launchUrl(
+                                              state.recipeModel.youtubeUrl ??
+                                                  '');
+                                        },
+                                        title: const Text(
+                                          'Link Video Youtube',
+                                          style: TextStyle(
+                                              color: Colors.blue,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        trailing: const Icon(
+                                            Icons.arrow_forward,
+                                            color: Colors.black),
+                                        leading: SizedBox(
+                                          height: 30,
+                                          width: 30,
+                                          child: CachedNetworkImage(
+                                              imageUrl:
+                                                  "https://cdn-icons-png.flaticon.com/512/1384/1384060.png"),
+                                        ),
+                                      )
+                                    ],
+                                  )
+                                : const SizedBox(),
+                            const SizedBox(
+                              height: 15,
+                            ),
                             Center(
                               child: statusAd == StatusAd.loaded
                                   ? Container(
@@ -427,7 +492,7 @@ class _RecipeDetailState extends State<RecipeDetail> {
                     child: Row(
                       children: [
                         Container(
-                          margin: EdgeInsets.only(left: 10, top: 10),
+                          margin: const EdgeInsets.only(left: 10, top: 10),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.black.withOpacity(0.2),

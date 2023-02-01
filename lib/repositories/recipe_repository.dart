@@ -24,6 +24,7 @@ class RecipeRepository {
         print(e.toString());
       }
     }
+    return null;
   }
 
   Future<List<RecipeModel>?> getTopBookmarkRecipes() async {
@@ -42,6 +43,7 @@ class RecipeRepository {
         print(e.toString());
       }
     }
+    return null;
   }
 
   Future<List<RecipeModel>?> getTopViewRecipes() async {
@@ -60,6 +62,7 @@ class RecipeRepository {
         print(e.toString());
       }
     }
+    return null;
   }
 
   Future<RecipeModel?> getRecipeDetail(int id) async {
@@ -75,6 +78,7 @@ class RecipeRepository {
         print(e.toString());
       }
     }
+    return null;
   }
 
   Future<List<RecipeCategoryModel>?> getRecipeCategory() async {
@@ -93,6 +97,7 @@ class RecipeRepository {
         print(e.toString());
       }
     }
+    return null;
   }
 
   Future<List<RecipeModel>?> getListRecipesbyCategory(
@@ -113,6 +118,7 @@ class RecipeRepository {
         print(e.toString());
       }
     }
+    return null;
   }
 
   Future<List<RecipeModel>?> getSearchRecipes({String? keyword}) async {
@@ -132,5 +138,6 @@ class RecipeRepository {
         print(e.toString());
       }
     }
+    return null;
   }
 }

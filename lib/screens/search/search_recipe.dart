@@ -81,7 +81,7 @@ class _SearchRecipeState extends State<SearchRecipe> {
           margin: const EdgeInsets.only(top: 15),
           child: statusAd == StatusAd.loaded
               ? Container(
-                  margin: EdgeInsets.only(top: 10, left: 10, right: 10),
+                  margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
                   alignment: Alignment.center,
                   child: AdWidget(ad: myBanner!),
                   width: myBanner!.size.width.toDouble(),

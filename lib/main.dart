@@ -70,6 +70,7 @@ class MyApp extends StatelessWidget {
             upgrader: Upgrader(
                 showIgnore: false,
                 showLater: false,
+                durationUntilAlertAgain: const Duration(hours: 3),
                 showReleaseNotes: false,
                 canDismissDialog: false),
             child: const Dashboard()),

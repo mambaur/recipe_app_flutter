@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_slider/carousel_controller.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -217,7 +216,7 @@ class _DashboardState extends State<Dashboard> {
                       _launchUrl(_otherAppsUrl);
                     },
                     title: const Text("Aplikasi Lainnya")),
-                ListTile(onTap: () {}, title: Text("Version $version")),
+                ListTile(onTap: () {}, title: Text("Versi $version")),
               ]),
             ),
           ),
@@ -405,6 +404,7 @@ class _DashboardState extends State<Dashboard> {
                             'Resep Populer',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
+                              fontSize: 16,
                             ),
                           ),
                         ),
@@ -565,6 +565,7 @@ class _DashboardState extends State<Dashboard> {
                             'Semua Resep',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
+                              fontSize: 16,
                             ),
                           ),
                         ),

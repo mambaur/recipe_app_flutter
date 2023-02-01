@@ -91,12 +91,16 @@ class _RecipeCategoryResultState extends State<RecipeCategoryResult> {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       itemBuilder: (context, index) {
                         return ListTile(
-                          title: Text(
-                            state.listRecipes[index].title != null
-                                ? state.listRecipes[index].title!
-                                : TextFormat.slugToTitle(
-                                    state.listRecipes[index].slug ?? ''),
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                          title: Container(
+                            margin: const EdgeInsets.only(bottom: 5),
+                            child: Text(
+                              state.listRecipes[index].title != null
+                                  ? state.listRecipes[index].title!
+                                  : TextFormat.slugToTitle(
+                                      state.listRecipes[index].slug ?? ''),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
                           ),
                           subtitle: Wrap(
                             crossAxisAlignment: WrapCrossAlignment.center,
@@ -169,8 +173,8 @@ class _RecipeCategoryResultState extends State<RecipeCategoryResult> {
                     alignment: Alignment.bottomCenter,
                     child: statusAd == StatusAd.loaded
                         ? Container(
-                            margin:
-                                EdgeInsets.only(top: 10, left: 10, right: 10),
+                            margin: const EdgeInsets.only(
+                                top: 10, left: 10, right: 10),
                             alignment: Alignment.center,
                             child: AdWidget(ad: myBanner!),
                             width: myBanner!.size.width.toDouble(),
